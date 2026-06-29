@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>fetch('https://api.counterapi.dev/v1/voltflow/calc/up',{cache:'no-store'}).catch(()=>{});</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LV Cable Calculator — IEC 60502-1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ────────────────────────────────────────────────── */
+:root {
+  --bg:        #ffffff;
+  --bg2:       #f8f9fa;
+  --bg3:       #f0f2f5;
+  --border:    rgba(0,0,0,0.09);
+  --border2:   rgba(0,0,0,0.16);
+  --accent:    #007a52;
+  --accent2:   #005c3d;
+  --accent-dim:rgba(0,122,82,0.10);
+  --warn:      #c94a1a;
+  --warn-dim:  rgba(201,74,26,0.10);
+  --ok:        #007a52;
+  --ok-dim:    rgba(0,122,82,0.10);
+  --blue:      #1a6fc4;
+  --blue-dim:  rgba(26,111,196,0.10);
+  --text:      #111827;
+  --text2:     #374151;
+  --text3:     #6b7280;
+  --mono:      'DM Mono', monospace;
+  --sans:      'DM Sans', sans-serif;
+  --space:     'Space Mono', monospace;
+  --radius:    6px;
+  --radius2:   10px;
+}
+
+/* ── RESET & BASE ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text);
+  background: #f0f2f5;
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* ── HEADER ────────────────────────────────────────────────── */
+.site-header {
+  border-bottom: 1px solid var(--border2);
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0 2rem;
+}
+.header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  height: 56px;
+}
+.header-logo {
+  font-family: var(--space);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.header-logo span { color: var(--text3); }
+.header-sep { width: 1px; height: 28px; background: var(--border2); flex-shrink: 0; }
+.header-ref {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  line-height: 1.6;
+}
+.header-ref a { color: var(--blue); text-decoration: none; }
+.header-ref a:hover { color: var(--accent); }
+.header-badge {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 2px 8px;
+  border-radius: 2px;
+  letter-spacing: .1em;
+  white-space: nowrap;
+  background: var(--accent-dim);
+}
+
+/* ── LAYOUT ────────────────────────────────────────────────── */
+.app-body { max-width: 1280px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+/* ── PANEL ─────────────────────────────────────────────────── */
+.panel {
+  background: #ffffff;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius2);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .75rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: #f0f2f5;
+}
+.panel-num {
+  font-family: var(--space);
+  font-size: 9px;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(0,122,82,0.2);
+  width: 22px; height: 22px;
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0;
+}
+.panel-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.panel-subtitle {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  margin-left: auto;
+}
+.panel-body { padding: 1.25rem; }
+
+/* ── FORM ELEMENTS ─────────────────────────────────────────── */
+.field-grid { display: grid; gap: 1rem; }
+.fg-4 { grid-template-columns: repeat(4, 1fr); }
+.fg-3 { grid-template-columns: repeat(3, 1fr); }
+.fg-2 { grid-template-columns: repeat(2, 1fr); }
+.fg-1 { grid-template-columns: 1fr; }
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.field-label em { color: var(--accent); font-style: normal; }
+.field-note { font-size: 9px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
+
+input, select {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 7px 10px;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+input:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,122,82,0.12);
+}
+input[readonly] {
+  color: var(--text2);
+  cursor: default;
+  border-color: var(--border);
+  background: var(--bg3);
+}
+select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7280'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; background-color: #ffffff; }
+optgroup { color: var(--text3); font-size: 10px; font-style: normal; }
+option { background: #ffffff; color: var(--text); font-family: var(--mono); font-size: 11px; }
+
+/* ── SECTION DIVIDER ───────────────────────────────────────── */
+.sect-divider {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: .75rem 0 .4rem;
+  border-top: 1px solid var(--border);
+  margin-top: .5rem;
+}
+
+/* ── WITH-ILLUS LAYOUT ─────────────────────────────────────── */
+.with-illus { display: grid; grid-template-columns: 1fr 320px; gap: 1.25rem; align-items: start; }
+
+/* ── ILLUSTRATION PANEL ────────────────────────────────────── */
+.illus-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+}
+.illus-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--accent);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: .6rem;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+.illus-tag::before {
+  content: '';
+  display: inline-block;
+  width: 12px; height: 1px;
+  background: var(--accent);
+}
+.illus-svg { flex: 1; display: flex; align-items: center; justify-content: center; }
+.illus-svg svg { max-width: 100%; height: auto; }
+.illus-caption {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text3);
+  line-height: 1.6;
+  margin-top: .6rem;
+  border-top: 1px solid var(--border);
+  padding-top: .5rem;
+}
+.illus-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text2);
+  margin-bottom: .4rem;
+  line-height: 1.4;
+}
+
+/* ── K1 CHART ──────────────────────────────────────────────── */
+.k1-wrap { position: relative; height: 200px; margin-top: 1rem; }
+.k1-wrap canvas { width: 100% !important; height: 100% !important; }
+
+.k1-stat {
+  display: flex; align-items: baseline; gap: .5rem; margin-top: .75rem;
+  font-family: var(--mono);
+}
+.k1-stat-label { font-size: 10px; color: var(--text3); }
+.k1-stat-val { font-size: 22px; color: var(--accent); letter-spacing: -.02em; }
+.k1-stat-unit { font-size: 11px; color: var(--text3); }
+
+/* ── K3 TABLE ──────────────────────────────────────────────── */
+.k3-table { width: 100%; border-collapse: collapse; }
+.k3-table thead th {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border2);
+  text-align: left;
+  font-weight: 400;
+}
+.k3-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .12s;
+}
+.k3-table tbody tr:hover { background: #f0f2f5; }
+.k3-table tbody tr:last-child { border-bottom: none; }
+.k3-table tbody tr:hover { background: rgba(255,255,255,0.025); }
+.k3-table tbody tr.active { background: var(--accent-dim); }
+.k3-table tbody tr.active td { border-color: rgba(0,229,160,0.15); }
+.k3-table td {
+  padding: 8px 10px;
+  font-size: 12px;
+  vertical-align: middle;
+}
+.k3-table td.k3-sit { font-family: var(--mono); font-size: 10px; color: var(--text); }
+.k3-table td.k3-desc { font-size: 10px; color: var(--text3); font-family: var(--mono); }
+.k3-table td.k3-range { font-family: var(--mono); font-size: 10px; color: var(--text3); white-space: nowrap; }
+.k3-table td input[type="number"] { width: 64px; padding: 4px 6px; font-size: 11px; }
+.k3-table td input[type="checkbox"] {
+  width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent);
+  background: var(--bg3); border: 1px solid var(--border2);
+}
+.k3-total {
+  display: flex; align-items: baseline; gap: .4rem; margin-top: .75rem;
+  font-family: var(--mono); padding-top: .6rem; border-top: 1px solid var(--border);
+}
+.k3-total-label { font-size: 10px; color: var(--text3); }
+.k3-total-val { font-size: 18px; color: var(--accent); }
+
+/* ── RESULTS GRID ──────────────────────────────────────────── */
+.results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .75rem; }
+
+.metric {
+  background: #f8f9fa;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: .75rem 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .15s;
+}
+.metric::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--border2);
+}
+.metric.ok { border-color: rgba(0,229,160,0.3); }
+.metric.ok::before { background: var(--accent); }
+.metric.warn { border-color: rgba(255,107,53,0.3); }
+.metric.warn::before { background: var(--warn); }
+.metric-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.metric-val {
+  font-family: var(--space);
+  font-size: 20px;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -.02em;
+}
+.metric.ok .metric-val  { color: var(--accent); }
+.metric.warn .metric-val { color: var(--warn); }
+.metric-unit {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  margin-left: 3px;
+}
+
+/* ── CHECKS ────────────────────────────────────────────────── */
+.checks { display: flex; flex-direction: column; gap: .4rem; }
+.check-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+}
+.check-row.check-overall {
+  border-color: var(--border2);
+  background: #f0f2f5;
+}
+.check-row.check-overall span:first-child { color: var(--text); font-weight: 500; }
+.chip {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  padding: 3px 10px;
+  border-radius: 2px;
+  font-weight: 500;
+}
+.chip-ok   { background: var(--ok-dim);   color: var(--ok);   border: 1px solid rgba(0,229,160,0.3); }
+.chip-warn { background: var(--warn-dim);  color: var(--warn); border: 1px solid rgba(255,107,53,0.3); }
+
+/* ── CB HINT ───────────────────────────────────────────────── */
+.cb-hint { font-family: var(--mono); font-size: 9px; color: var(--text3); margin-top: 4px; }
+
+/* ── K2 STAT ───────────────────────────────────────────────── */
+.factor-display {
+  display: flex; align-items: baseline; gap: .4rem;
+  margin-top: .75rem; font-family: var(--mono);
+  padding-top: .6rem; border-top: 1px solid var(--border);
+}
+.factor-display-label { font-size: 10px; color: var(--text3); }
+.factor-display-val { font-size: 18px; color: var(--blue); }
+.factor-display-src { font-size: 9px; color: var(--text3); margin-left: .5rem; }
+
+/* ── CONDUIT TABLE ─────────────────────────────────────────── */
+.cond-rows { display: flex; flex-direction: column; gap: .5rem; margin-top: .75rem; }
+.cond-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 70px 75px;
+  gap: .6rem;
+  align-items: center;
+}
+.cond-row-label { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+
+/* ── SCROLLBAR ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #f0f2f5; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+
+/* ── RESPONSIVE ────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .with-illus { grid-template-columns: 1fr; }
+  .fg-4 { grid-template-columns: repeat(2, 1fr); }
+  .fg-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 540px) {
+  .fg-4, .fg-3, .fg-2 { grid-template-columns: 1fr; }
+  .cond-row { grid-template-columns: 1fr 1fr; }
+  .app-body { padding: 1rem; }
+}
+
+/* ── ANIMATIONS ────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.panel { animation: fadeUp .3s ease both; }
+.panel:nth-child(1) { animation-delay: .02s; }
+.panel:nth-child(2) { animation-delay: .06s; }
+.panel:nth-child(3) { animation-delay: .10s; }
+.panel:nth-child(4) { animation-delay: .14s; }
+.panel:nth-child(5) { animation-delay: .18s; }
+.panel:nth-child(6) { animation-delay: .22s; }
+.panel:nth-child(7) { animation-delay: .26s; }
+
+/* ── CASCADING LEVEL SELECTOR ──────────────────────────────────── */
+.cascade-wrap { display: flex; flex-direction: column; gap: .75rem; }
+.level-row { display: flex; flex-direction: column; gap: 5px; }
+.level-label { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; display: flex; align-items: center; gap: .5rem; }
+.level-label .lvl-badge { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(0,229,160,0.25); border-radius: 2px; padding: 1px 6px; font-size: 8px; }
+.btn-group { display: flex; flex-wrap: wrap; gap: 6px; }
+.sel-btn {
+  font-family: var(--mono); font-size: 11px; padding: 6px 14px;
+  background: #ffffff; border: 1px solid var(--border2); border-radius: var(--radius);
+  color: var(--text2); cursor: pointer; transition: all .15s; white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.sel-btn:hover { border-color: var(--accent); color: var(--text); background: var(--accent-dim); }
+.sel-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); font-weight: 500; }
+.sel-btn:disabled, .sel-btn.locked { opacity: .3; cursor: not-allowed; pointer-events: none; }
+.col-badge { display: inline-block; font-family: var(--space); font-size: 9px; padding: 2px 7px; border-radius: 2px; background: rgba(77,159,255,0.15); color: var(--blue); border: 1px solid rgba(77,159,255,0.3); margin-left: 6px; }
+.tbl-badge { display: inline-block; font-family: var(--mono); font-size: 9px; padding: 2px 7px; border-radius: 2px; background: rgba(0,229,160,0.1); color: var(--accent); border: 1px solid rgba(0,229,160,0.2); margin-left: 6px; }
+.base-cond { font-family: var(--mono); font-size: 9px; color: var(--text3); margin-top: 4px; }
+
+/* Derating sub-section */
+.derate-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .75rem; margin-top: .75rem; }
+.derate-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: .65rem .85rem; }
+.derate-card-label { font-family: var(--mono); font-size: 9px; color: var(--text3); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 5px; }
+.derate-card select, .derate-card input { font-size: 11px; padding: 5px 8px; }
+.derate-val { font-family: var(--space); font-size: 16px; color: var(--accent); margin-top: 4px; }
+.derate-val-lbl { font-family: var(--mono); font-size: 9px; color: var(--text3); margin-left: 4px; }
+
+/* k3 row active highlight */
+#k3Table tbody tr.active td { background: rgba(0,122,82,0.07); }
+#k3Table tbody tr.active .k3-sit { color: var(--accent); }
+input[type=checkbox]:checked { accent-color: var(--accent); }
+
+/* Icb output */
+.icb-display { display: flex; align-items: baseline; gap: .5rem; padding: .75rem 0; border-top: 1px solid var(--border); margin-top: .75rem; flex-wrap: wrap; }
+.icb-lbl { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+.icb-val { font-family: var(--space); font-size: 24px; color: var(--blue); letter-spacing: -.02em; }
+.icb-unit { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-logo">LV<span>/</span>CABLE<span> ·</span> CALC</div>
+    <div class="header-sep"></div>
+    <div class="header-ref">
+      IEC 60502-1 / IEC 60287 / IEC 60364 &nbsp;·&nbsp; SC = Single Conductor &nbsp;|&nbsp; MC = Multi-Conductor
+    </div>
+    <div class="header-badge">IEC 60502-1</div>
+  </div>
+</header>
+
+<main class="app-body">
+
+<!-- ① PRIMARY INPUTS -->
+<div class="panel">
+  <div class="panel-header">
+    <div class="panel-num">01</div>
+    <div class="panel-title">Circuit Parameters</div>
+    <div class="panel-subtitle">Load · Voltage · Cable</div>
+  </div>
+  <div class="panel-body">
+    <div class="field-grid fg-4">
+      <div class="field">
+        <label class="field-label">Load <em>(kVA)</em></label>
+        <input type="number" id="load" value="26.16" step="any">
+      </div>
+      <div class="field">
+        <label class="field-label">Power Factor</label>
+        <input type="number" id="pf" value="0.9" step="0.01" min="0.1" max="1">
+      </div>
+      <div class="field">
+        <label class="field-label">Voltage <em>(V)</em></label>
+        <input type="number" id="voltage" value="400" step="any">
+      </div>
+      <div class="field">
+        <label class="field-label">Length <em>(m)</em></label>
+        <input type="number" id="length" value="20" step="any">
+      </div>
+      <div class="field">
+        <label class="field-label">Phases</label>
+        <select id="phases">
+          <option value="3">3-phase</option>
+          <option value="1">1-phase</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">Cable Size <em>(mm²)</em></label>
+        <select id="cableSize">
+          <option>1.5</option><option>2.5</option><option>4</option><option>6</option>
+          <option value="10" selected>10</option><option>16</option><option>25</option>
+          <option>35</option><option>50</option><option>70</option><option>95</option>
+          <option>120</option><option>150</option><option>185</option><option>240</option>
+          <option>300</option><option>400</option><option>500</option><option>630</option>
+          <option>800</option><option>1000</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">Cable Type</label>
+        <select id="cableType">
+          <optgroup label="Single Conductor — 1C">
+            <option>1C-CU-PVC</option>
+            <option value="1C-CU-XLPE" selected>1C-CU-XLPE</option>
+            <option>1C-AL-PVC</option>
+            <option>1C-AL-XLPE</option>
+          </optgroup>
+          <optgroup label="Multi-Conductor — MC">
+            <option>MC-CU-PVC</option>
+            <option>MC-CU-XLPE</option>
+            <option>MC-AL-PVC</option>
+            <option>MC-AL-XLPE</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">Max V-Drop Limit <em>(%)</em></label>
+        <input type="number" id="vdropLimit" value="5" step="0.5" min="0.5" max="20">
+        <span class="field-note">IEC: 3–5% normal operation</span>
+      </div>
+    </div>
+
+    <div class="sect-divider">Circuit Breaker</div>
+    <div class="field-grid fg-2">
+      <div class="field">
+        <label class="field-label">Chosen CB Size <em>(A)</em></label>
+        <select id="chosenCB"></select>
+        <div class="cb-hint" id="cbHint"></div>
+      </div>
+      <div class="field">
+        <label class="field-label">Available SCC at Source <em>(kA)</em></label>
+        <input type="number" id="sccSource" value="25" step="any">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ② K1 TEMPERATURE DERATING -->
+<div class="panel">
+  <div class="panel-header">
+    <div class="panel-num">02</div>
+    <div class="panel-title">Temperature Derating &mdash; k<sub>1</sub></div>
+    <div class="panel-subtitle">Per IEC 60287</div>
+  </div>
+  <div class="panel-body">
+    <div class="field-grid fg-2">
+      <div class="field">
+        <label class="field-label">Ambient Temperature <em>(°C)</em></label>
+        <select id="k1Temp">
+          <option>10</option><option>15</option><option>20</option><option>25</option>
+          <option>30</option><option>35</option><option>40</option>
+          <option value="45" selected>45</option><option>50</option>
+          <option>55</option><option>60</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">Medium <em>(auto-detected)</em></label>
+        <input type="text" id="k1Medium" readonly>
+      </div>
+    </div>
+    <div class="k1-wrap"><canvas id="k1Canvas"></canvas></div>
+    <div class="k1-stat">
+      <span class="k1-stat-label">k<sub>1</sub> =</span>
+      <span class="k1-stat-val" id="k1Val">—</span>
+      <span class="k1-stat-unit">derating factor</span>
+      <span style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--text3)">Base: 40°C air / 35°C ground</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ③ INSTALLATION & AMPACITY — k1 medium, Icb column, k2, soil derating -->
+<div class="panel">
+  <div class="panel-header">
+    <div class="panel-num">03</div>
+    <div class="panel-title">Installation &amp; Ampacity</div>
+    <div class="panel-subtitle">Icb column · k<sub>2</sub> grouping · soil / depth derating</div>
+  </div>
+  <div class="panel-body">
+    <div class="with-illus">
+      <div>
+
+        <!-- LEVEL 1 -->
+        <div class="level-row">
+          <div class="level-label"><span class="lvl-badge">L1</span> Installation medium</div>
+          <div class="btn-group">
+            <button class="sel-btn" id="l1-ug"  onclick="setL1('underground')">Underground</button>
+            <button class="sel-btn" id="l1-air" onclick="setL1('air')">Free air</button>
+          </div>
+        </div>
+
+        <!-- LEVEL 2 -->
+        <div class="level-row" id="l2-row" style="display:none">
+          <div class="level-label"><span class="lvl-badge">L2</span> Installation method</div>
+          <div class="btn-group" id="l2-btns"></div>
+        </div>
+
+        <!-- LEVEL 3 -->
+        <div class="level-row" id="l3-row" style="display:none">
+          <div class="level-label"><span class="lvl-badge">L3</span> Cable formation</div>
+          <div class="btn-group" id="l3-btns"></div>
+        </div>
+
+        <!-- Icb result display -->
+        <div class="icb-display" id="icb-display" style="display:none">
+          <span class="icb-lbl">I<sub>cb</sub> =</span>
+          <span class="icb-val" id="icb-val">—</span>
+          <span class="icb-unit">A</span>
+          <span class="col-badge" id="icb-col-badge"></span>
+          <span class="tbl-badge" id="icb-tbl-badge"></span>
+          <span class="base-cond" id="icb-base-cond"></span>
+        </div>
+
+        <!-- DERATING FACTORS -->
+        <div id="derate-section" style="display:none">
+          <div class="sect-divider">Additional derating factors</div>
+          <div class="derate-grid">
+
+            <!-- 4B Burial depth (underground only) -->
+            <div class="derate-card" id="card-depth" style="display:none">
+              <div class="derate-card-label">Burial depth — Table 5</div>
+              <select id="depthSel" onchange="calc()">
+                <option value="0.50_1.00_1.00_1.00">0.50 m</option>
+                <option value="0.60_0.99_0.98_0.97">0.60 m</option>
+                <option value="0.80_0.97_0.96_0.94" selected>0.80 m</option>
+                <option value="1.00_0.95_0.93_0.92">1.00 m</option>
+                <option value="1.25_0.94_0.92_0.89">1.25 m</option>
+                <option value="1.50_0.93_0.90_0.87">1.50 m</option>
+                <option value="1.75_0.92_0.89_0.86">1.75 m</option>
+                <option value="2.00_0.91_0.88_0.85">2.00 m</option>
+              </select>
+              <div class="derate-val" id="depth-val">—<span class="derate-val-lbl">k_depth</span></div>
+            </div>
+
+            <!-- 4C Soil resistivity (underground only) -->
+            <div class="derate-card" id="card-soil" style="display:none">
+              <div class="derate-card-label">Soil resistivity — Table 6</div>
+              <select id="soilSel" onchange="calc()">
+                <option value="0.8_1.17">0.8 K·m/W — wet clay / saturated</option>
+                <option value="0.9_1.12">0.9 K·m/W — moist clay</option>
+                <option value="1.0_1.07">1.0 K·m/W — damp soil</option>
+                <option value="1.2_1.00" selected>1.2 K·m/W — normal soil (base)</option>
+                <option value="1.5_0.91">1.5 K·m/W — dry sandy soil</option>
+                <option value="2.0_0.80">2.0 K·m/W — very dry sandy</option>
+                <option value="2.5_0.73">2.5 K·m/W — dry rock / desert</option>
+              </select>
+              <div class="derate-val" id="soil-val">—<span class="derate-val-lbl">k_soil</span></div>
+            </div>
+
+            <!-- 4D PVC temp (PVC only) -->
+            <div class="derate-card" id="card-pvc" style="display:none">
+              <div class="derate-card-label">PVC rated temp — Table 7</div>
+              <select id="pvcSel" onchange="calc()">
+                <option value="1.000" selected>70°C (base)</option>
+                <option value="1.195">85°C</option>
+                <option value="1.309">95°C</option>
+                <option value="1.414">105°C</option>
+              </select>
+              <div class="derate-val" id="pvc-val">—<span class="derate-val-lbl">k_pvc</span></div>
+            </div>
+
+            <!-- 4E Grouping / No. of circuits -->
+            <div class="derate-card" id="card-group">
+              <div class="derate-card-label">No. of circuits — k<sub>2</sub></div>
+              <select id="numCircuits" onchange="calc()">
+                <option value="1">1 circuit</option>
+                <option value="2">2 circuits</option>
+                <option value="3">3 circuits</option>
+                <option value="4" selected>4 circuits</option>
+                <option value="6">6 circuits</option>
+                <option value="9">9 circuits</option>
+              </select>
+              <div class="derate-val" id="k2-val">—<span class="derate-val-lbl">k<sub>2</sub></span></div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Illustration panel -->
+      <div class="illus-box">
+        <div class="illus-tag" id="k2IllusTag">Laying arrangement</div>
+        <div class="illus-title" id="k2IllusTitle">Select installation method above</div>
+        <div class="illus-svg" id="k2IllusSVG"></div>
+        <div class="illus-caption" id="k2IllusCaption"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ④ K3 INSTALLATION SITUATION -->
+<div class="panel">
+  <div class="panel-header">
+    <div class="panel-num">04</div>
+    <div class="panel-title">Additional situation factors &mdash; k<sub>3</sub></div>
+    <div class="panel-subtitle">Hover row to preview · Check to activate · Row highlights when on</div>
+  </div>
+  <div class="panel-body">
+    <div class="with-illus">
+      <div>
+        <table class="k3-table" id="k3Table">
+          <thead>
+            <tr>
+              <th>Situation</th>
+              <th>Condition</th>
+              <th>Range</th>
+              <th>Value</th>
+              <th>On</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-k3="0" id="k3r0">
+              <td class="k3-sit">Ducts / enclosed trenches</td>
+              <td class="k3-desc">Restricted airflow — underground in duct</td>
+              <td class="k3-range">0.90–0.95</td>
+              <td><input type="number" id="k3v0" value="0.92" step="0.01" min="0.5" max="1"></td>
+              <td><input type="checkbox" id="k3c0"></td>
+            </tr>
+            <tr data-k3="1" id="k3r1">
+              <td class="k3-sit">Multiple tray layers</td>
+              <td class="k3-desc">Vertical stacking / dense bundles</td>
+              <td class="k3-range">0.85–0.95</td>
+              <td><input type="number" id="k3v1" value="0.90" step="0.01" min="0.5" max="1"></td>
+              <td><input type="checkbox" id="k3c1"></td>
+            </tr>
+            <tr data-k3="2" id="k3r2">
+              <td class="k3-sit">Low ventilation</td>
+              <td class="k3-desc">Ceiling voids, plant rooms, shafts</td>
+              <td class="k3-range">~0.90</td>
+              <td><input type="number" id="k3v2" value="0.90" step="0.01" min="0.5" max="1"></td>
+              <td><input type="checkbox" id="k3c2"></td>
+            </tr>
+            <tr data-k3="3" id="k3r3">
+              <td class="k3-sit">Harmonic currents</td>
+              <td class="k3-desc">3-ph 4-wire, non-linear loads (VFD / UPS)</td>
+              <td class="k3-range">~0.95</td>
+              <td><input type="number" id="k3v3" value="0.95" step="0.01" min="0.5" max="1"></td>
+              <td><input type="checkbox" id="k3c3"></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="k3-total">
+          <span class="k3-total-label">k<sub>3</sub> total =</span>
+          <span class="k3-total-val" id="k3disp">1.0000</span>
+        </div>
+      </div>
+      <div class="illus-box">
+        <div class="illus-tag" id="k3IllusTag">Installation condition</div>
+        <div class="illus-title" id="k3IllusTitle">Hover or check a row</div>
+        <div class="illus-svg" id="k3IllusSVG"></div>
+        <div class="illus-caption" id="k3IllusCaption"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑤ RESULTS -->
+<div class="panel">
+  <div class="panel-header">
+    <div class="panel-num">05</div>
+    <div class="panel-title">Calculation Results</div>
+    <div class="panel-subtitle">Live · updates on every input change</div>
+  </div>
+  <div class="panel-body">
+    <div class="sect-divider" style="border-top:none;padding-top:0;margin-top:0">Cable Parameters</div>
+    <div class="results-grid" id="cableResults"></div>
+
+    <div class="sect-divider">Derating Chain</div>
+    <div class="results-grid" id="deratingResults"></div>
+
+    <div class="sect-divider">Design Checks</div>
+    <div class="checks" id="checksDiv"></div>
+
+    <div class="sect-divider">Short Circuit Capacity &mdash; SCC</div>
+    <div class="results-grid" id="sccResults"></div>
+  </div>
+</div>
+
+<!-- ⑥ CONDUIT FILL -->
+<div class="panel">
+  <div class="panel-header">
+    <div class="panel-num">06</div>
+    <div class="panel-title">Conduit Fill Check</div>
+    <div class="panel-subtitle">Max 40% fill factor</div>
+  </div>
+  <div class="panel-body">
+    <div class="field-grid fg-2">
+      <div class="field">
+        <label class="field-label">Conduit Size <em>(mm)</em></label>
+        <select id="conduitSize">
+          <option>16</option><option>20</option><option>25</option><option>32</option>
+          <option>40</option><option>50</option><option>63</option>
+          <option value="75" selected>75</option><option>80</option>
+          <option>100</option><option>125</option><option>150</option><option>200</option>
+        </select>
+      </div>
+    </div>
+    <div class="sect-divider">Conductors</div>
+    <div class="cond-rows" id="condRows"></div>
+    <div class="sect-divider">Fill Results</div>
+    <div class="results-grid" id="condResults"></div>
+  </div>
+</div>
+
+</main>
+
+<script>
+const K2_SVG = {
+  "ug-direct-trefoil": {title:"Underground \u00b7 Direct buried \u00b7 Trefoil",caption:"3\u00d71C cables in trefoil formation, buried directly in ground.",svg:`<svg viewBox="0 0 280 150" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#f8f9fa;border-radius:4px;border:1px solid rgba(0,0,0,0.1)">   <defs>     <pattern id="gr" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">       <path d="M16 0L0 0 0 16" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.5"/>     </pattern>     <pattern id="soil_hatch" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">       <line x1="0" y1="8" x2="8" y2="0" stroke="#a07840" stroke-width="0.6" opacity="0.5"/>     </pattern>   </defs>   <rect width="280" height="150" fill="#f8f9fa"/>   <rect width="280" height="150" fill="url(#gr)"/>   <rect x="0" y="0" width="280" height="45" fill="#dbeafe"/><rect x="0" y="45" width="280" height="105" fill="#c9a96e"/><rect x="0" y="45" width="280" height="105" fill="url(#soil_hatch)"/><line x1="0" y1="45" x2="280" y2="45" stroke="#374151" stroke-width="1" stroke-dasharray="4,3"/><text x="14" y="28" text-anchor="start" font-family="DM Mono,monospace" font-size="8" fill="#1a6fc4" font-weight="400">SURFACE</text><circle cx="140" cy="71" r="18" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="140" cy="71" r="9.36" fill="#007a52" fill-opacity="0.75"/><text x="140" y="74" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L1</text><circle cx="121" cy="101" r="18" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="121" cy="101" r="9.36" fill="#b45309" fill-opacity="0.75"/><text x="121" y="104" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L2</text><circle cx="159" cy="101" r="18" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="159" cy="101" r="9.36" fill="#c94a1a" fill-opacity="0.75"/><text x="159" y="104" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L3</text><line x1="140" y1="71" x2="121" y2="101" stroke="#6b7280" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.4"/><line x1="140" y1="71" x2="159" y2="101" stroke="#6b7280" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.4"/><line x1="121" y1="101" x2="159" y2="101" stroke="#6b7280" stroke-width="0.5" stroke-dasharray="2,2" opacity="0.4"/><text x="140" y="138" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#6b7280" font-weight="400">Table 8 · col (a) · trefoil · direct burial</text> </svg>`},
+  "ug-direct-flat": {title:"Underground \u00b7 Direct buried \u00b7 Flat touching",caption:"3\u00d71C cables in flat touching formation, buried directly in ground.",svg:`<svg viewBox="0 0 280 150" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#f8f9fa;border-radius:4px;border:1px solid rgba(0,0,0,0.1)">   <defs>     <pattern id="gr" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">       <path d="M16 0L0 0 0 16" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.5"/>     </pattern>     <pattern id="soil_hatch" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">       <line x1="0" y1="8" x2="8" y2="0" stroke="#a07840" stroke-width="0.6" opacity="0.5"/>     </pattern>   </defs>   <rect width="280" height="150" fill="#f8f9fa"/>   <rect width="280" height="150" fill="url(#gr)"/>   <rect x="0" y="0" width="280" height="48" fill="#dbeafe"/><rect x="0" y="48" width="280" height="102" fill="#c9a96e"/><rect x="0" y="48" width="280" height="102" fill="url(#soil_hatch)"/><line x1="0" y1="48" x2="280" y2="48" stroke="#374151" stroke-width="1" stroke-dasharray="4,3"/><text x="14" y="28" text-anchor="start" font-family="DM Mono,monospace" font-size="8" fill="#1a6fc4" font-weight="400">SURFACE</text><line x1="70" y1="60" x2="178" y2="60" stroke="#6b7280" stroke-width="0.8"/><line x1="70" y1="57" x2="70" y2="63" stroke="#6b7280" stroke-width="0.8"/><line x1="178" y1="57" x2="178" y2="63" stroke="#6b7280" stroke-width="0.8"/><text x="124.0" y="56" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">touching</text><circle cx="88" cy="95" r="18" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="88" cy="95" r="9.36" fill="#007a52" fill-opacity="0.75"/><text x="88" y="98" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L1</text><circle cx="124" cy="95" r="18" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="124" cy="95" r="9.36" fill="#b45309" fill-opacity="0.75"/><text x="124" y="98" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L2</text><circle cx="160" cy="95" r="18" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="160" cy="95" r="9.36" fill="#c94a1a" fill-opacity="0.75"/><text x="160" y="98" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L3</text><text x="140" y="138" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#6b7280" font-weight="400">Table 8 · col (b) · flat touching · direct burial</text> </svg>`},
+  "ug-duct-trefoil": {title:"Underground \u00b7 Buried duct \u00b7 Trefoil",caption:"Each 1C cable in its own conduit, arranged trefoil, buried in ground.",svg:`<svg viewBox="0 0 280 155" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#f8f9fa;border-radius:4px;border:1px solid rgba(0,0,0,0.1)">   <defs>     <pattern id="gr" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">       <path d="M16 0L0 0 0 16" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.5"/>     </pattern>     <pattern id="soil_hatch" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">       <line x1="0" y1="8" x2="8" y2="0" stroke="#a07840" stroke-width="0.6" opacity="0.5"/>     </pattern>   </defs>   <rect width="280" height="155" fill="#f8f9fa"/>   <rect width="280" height="155" fill="url(#gr)"/>   <rect x="0" y="0" width="280" height="48" fill="#dbeafe"/><rect x="0" y="48" width="280" height="107" fill="#c9a96e"/><rect x="0" y="48" width="280" height="107" fill="url(#soil_hatch)"/><line x1="0" y1="48" x2="280" y2="48" stroke="#374151" stroke-width="1" stroke-dasharray="4,3"/><text x="14" y="28" text-anchor="start" font-family="DM Mono,monospace" font-size="8" fill="#1a6fc4" font-weight="400">SURFACE</text><circle cx="140" cy="74" r="20" fill="none" stroke="#374151" stroke-width="2"/><circle cx="140" cy="74" r="14" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="140" cy="74" r="7.28" fill="#007a52" fill-opacity="0.75"/><text x="140" y="77" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L1</text><circle cx="118" cy="108" r="20" fill="none" stroke="#374151" stroke-width="2"/><circle cx="118" cy="108" r="14" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="118" cy="108" r="7.28" fill="#b45309" fill-opacity="0.75"/><text x="118" y="111" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L2</text><circle cx="162" cy="108" r="20" fill="none" stroke="#374151" stroke-width="2"/><circle cx="162" cy="108" r="14" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="162" cy="108" r="7.28" fill="#c94a1a" fill-opacity="0.75"/><text x="162" y="111" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L3</text><text x="140" y="143" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#6b7280" font-weight="400">Table 8 · col (c) · trefoil in separate ducts</text> </svg>`},
+  "ug-duct-flat": {title:"Underground \u00b7 Buried duct \u00b7 Flat (separate ducts)",caption:"Each 1C cable in its own conduit, flat horizontal row, buried.",svg:`<svg viewBox="0 0 280 150" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#f8f9fa;border-radius:4px;border:1px solid rgba(0,0,0,0.1)">   <defs>     <pattern id="gr" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">       <path d="M16 0L0 0 0 16" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.5"/>     </pattern>     <pattern id="soil_hatch" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">       <line x1="0" y1="8" x2="8" y2="0" stroke="#a07840" stroke-width="0.6" opacity="0.5"/>     </pattern>   </defs>   <rect width="280" height="150" fill="#f8f9fa"/>   <rect width="280" height="150" fill="url(#gr)"/>   <rect x="0" y="0" width="280" height="45" fill="#dbeafe"/><rect x="0" y="45" width="280" height="105" fill="#c9a96e"/><rect x="0" y="45" width="280" height="105" fill="url(#soil_hatch)"/><line x1="0" y1="45" x2="280" y2="45" stroke="#374151" stroke-width="1" stroke-dasharray="4,3"/><text x="14" y="28" text-anchor="start" font-family="DM Mono,monospace" font-size="8" fill="#1a6fc4" font-weight="400">SURFACE</text><circle cx="75" cy="93" r="19" fill="none" stroke="#374151" stroke-width="2"/><circle cx="75" cy="93" r="13" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="75" cy="93" r="6.76" fill="#007a52" fill-opacity="0.75"/><text x="75" y="96" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L1</text><circle cx="117" cy="93" r="19" fill="none" stroke="#374151" stroke-width="2"/><circle cx="117" cy="93" r="13" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="117" cy="93" r="6.76" fill="#b45309" fill-opacity="0.75"/><text x="117" y="96" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L2</text><circle cx="159" cy="93" r="19" fill="none" stroke="#374151" stroke-width="2"/><circle cx="159" cy="93" r="13" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="159" cy="93" r="6.76" fill="#c94a1a" fill-opacity="0.75"/><text x="159" y="96" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L3</text><text x="140" y="138" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#6b7280" font-weight="400">Table 8 · col (c) · flat in separate ducts</text> </svg>`},
+  "air-tray-trefoil": {title:"Free air \u00b7 Tray/ladder \u00b7 Trefoil",caption:"3\u00d71C cables in trefoil on tray/ladder/brackets, free air.",svg:`<svg viewBox="0 0 280 140" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#f8f9fa;border-radius:4px;border:1px solid rgba(0,0,0,0.1)">   <defs>     <pattern id="gr" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">       <path d="M16 0L0 0 0 16" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.5"/>     </pattern>     <pattern id="soil_hatch" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">       <line x1="0" y1="8" x2="8" y2="0" stroke="#a07840" stroke-width="0.6" opacity="0.5"/>     </pattern>   </defs>   <rect width="280" height="140" fill="#f8f9fa"/>   <rect width="280" height="140" fill="url(#gr)"/>   <line x1="20" y1="112" x2="260" y2="112" stroke="#374151" stroke-width="2"/><rect x="20" y="112" width="240" height="10" fill="url(#soil_hatch)" opacity="0.4"/><text x="34" y="108" font-family="DM Mono,monospace" font-size="7" fill="#6b7280">≥ 2 cm</text><line x1="20" y1="95" x2="34" y2="95" stroke="#6b7280" stroke-width="0.8"/><circle cx="140" cy="61" r="18" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="140" cy="61" r="9.36" fill="#007a52" fill-opacity="0.75"/><text x="140" y="64" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L1</text><circle cx="121" cy="91" r="18" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="121" cy="91" r="9.36" fill="#b45309" fill-opacity="0.75"/><text x="121" y="94" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L2</text><circle cx="159" cy="91" r="18" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="159" cy="91" r="9.36" fill="#c94a1a" fill-opacity="0.75"/><text x="159" y="94" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L3</text><text x="140" y="130" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#6b7280" font-weight="400">Table 10 · col (d) · trefoil · free air / tray</text> </svg>`},
+  "air-tray-flat-t": {title:"Free air \u00b7 Tray/ladder \u00b7 Flat touching",caption:"3\u00d71C cables flat touching on tray/ladder, free air. Spacing = d.",svg:`<svg viewBox="0 0 280 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#f8f9fa;border-radius:4px;border:1px solid rgba(0,0,0,0.1)">   <defs>     <pattern id="gr" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">       <path d="M16 0L0 0 0 16" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.5"/>     </pattern>     <pattern id="soil_hatch" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">       <line x1="0" y1="8" x2="8" y2="0" stroke="#a07840" stroke-width="0.6" opacity="0.5"/>     </pattern>   </defs>   <rect width="280" height="130" fill="#f8f9fa"/>   <rect width="280" height="130" fill="url(#gr)"/>   <line x1="20" y1="102" x2="260" y2="102" stroke="#374151" stroke-width="2"/><rect x="20" y="102" width="240" height="10" fill="url(#soil_hatch)" opacity="0.4"/><text x="34" y="97" font-family="DM Mono,monospace" font-size="7" fill="#6b7280">≥ 2 cm</text><line x1="88" y1="50" x2="124" y2="50" stroke="#6b7280" stroke-width="0.8"/><line x1="88" y1="47" x2="88" y2="53" stroke="#6b7280" stroke-width="0.8"/><line x1="124" y1="47" x2="124" y2="53" stroke="#6b7280" stroke-width="0.8"/><text x="106.0" y="46" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">d</text><line x1="124" y1="50" x2="160" y2="50" stroke="#6b7280" stroke-width="0.8"/><line x1="124" y1="47" x2="124" y2="53" stroke="#6b7280" stroke-width="0.8"/><line x1="160" y1="47" x2="160" y2="53" stroke="#6b7280" stroke-width="0.8"/><text x="142.0" y="46" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">d</text><circle cx="88" cy="75" r="18" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="88" cy="75" r="9.36" fill="#007a52" fill-opacity="0.75"/><text x="88" y="78" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L1</text><circle cx="124" cy="75" r="18" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="124" cy="75" r="9.36" fill="#b45309" fill-opacity="0.75"/><text x="124" y="78" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L2</text><circle cx="160" cy="75" r="18" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="160" cy="75" r="9.36" fill="#c94a1a" fill-opacity="0.75"/><text x="160" y="78" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L3</text><text x="140" y="122" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#6b7280" font-weight="400">Table 9 · col (e) · flat touching · free air / tray</text> </svg>`},
+  "air-tray-flat-s": {title:"Free air \u00b7 Tray/ladder \u00b7 Flat spaced \u22651D",caption:"3\u00d71C cables spaced \u22651 diameter apart on tray.",svg:`<svg viewBox="0 0 310 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#f8f9fa;border-radius:4px;border:1px solid rgba(0,0,0,0.1)">   <defs>     <pattern id="gr" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">       <path d="M16 0L0 0 0 16" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.5"/>     </pattern>     <pattern id="soil_hatch" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">       <line x1="0" y1="8" x2="8" y2="0" stroke="#a07840" stroke-width="0.6" opacity="0.5"/>     </pattern>   </defs>   <rect width="310" height="130" fill="#f8f9fa"/>   <rect width="310" height="130" fill="url(#gr)"/>   <line x1="20" y1="102" x2="290" y2="102" stroke="#374151" stroke-width="2"/><rect x="20" y="102" width="270" height="10" fill="url(#soil_hatch)" opacity="0.4"/><line x1="83" y1="50" x2="105" y2="50" stroke="#6b7280" stroke-width="0.8"/><line x1="83" y1="47" x2="83" y2="53" stroke="#6b7280" stroke-width="0.8"/><line x1="105" y1="47" x2="105" y2="53" stroke="#6b7280" stroke-width="0.8"/><text x="94.0" y="46" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">≥ 1D</text><line x1="141" y1="50" x2="163" y2="50" stroke="#6b7280" stroke-width="0.8"/><line x1="141" y1="47" x2="141" y2="53" stroke="#6b7280" stroke-width="0.8"/><line x1="163" y1="47" x2="163" y2="53" stroke="#6b7280" stroke-width="0.8"/><text x="152.0" y="46" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">≥ 1D</text><circle cx="65" cy="75" r="18" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="65" cy="75" r="9.36" fill="#007a52" fill-opacity="0.75"/><text x="65" y="78" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L1</text><circle cx="123" cy="75" r="18" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="123" cy="75" r="9.36" fill="#b45309" fill-opacity="0.75"/><text x="123" y="78" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L2</text><circle cx="181" cy="75" r="18" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="181" cy="75" r="9.36" fill="#c94a1a" fill-opacity="0.75"/><text x="181" y="78" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L3</text><text x="155" y="122" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#6b7280" font-weight="400">Table 9 · col (f) · flat spaced ≥1D · free air</text> </svg>`},
+  "air-conduit-single": {title:"Free air \u00b7 Conduit / trunking / clipped",caption:"Cables clipped directly to wall or in conduit/trunking.",svg:`<svg viewBox="0 0 260 155" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#f8f9fa;border-radius:4px;border:1px solid rgba(0,0,0,0.1)">   <defs>     <pattern id="gr" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">       <path d="M16 0L0 0 0 16" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.5"/>     </pattern>     <pattern id="soil_hatch" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">       <line x1="0" y1="8" x2="8" y2="0" stroke="#a07840" stroke-width="0.6" opacity="0.5"/>     </pattern>   </defs>   <rect width="260" height="155" fill="#f8f9fa"/>   <rect width="260" height="155" fill="url(#gr)"/>   <rect x="14" y="10" width="12" height="135" fill="#d1d5db"/><rect x="14" y="10" width="12" height="135" fill="url(#soil_hatch)"/><line x1="26" y1="10" x2="26" y2="145" stroke="#374151" stroke-width="1.5"/><text x="12" y="8" text-anchor="start" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">WALL</text><text x="12" y="153" font-family="DM Mono,monospace" font-size="7" fill="#6b7280">clearance = d from wall</text><line x1="26" y1="42" x2="44" y2="42" stroke="#374151" stroke-width="1.5"/><line x1="26" y1="37" x2="26" y2="47" stroke="#374151" stroke-width="1.5"/><line x1="26" y1="70" x2="62" y2="70" stroke="#6b7280" stroke-width="0.8"/><line x1="26" y1="67" x2="26" y2="73" stroke="#6b7280" stroke-width="0.8"/><line x1="62" y1="67" x2="62" y2="73" stroke="#6b7280" stroke-width="0.8"/><text x="44.0" y="66" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">d</text><circle cx="62" cy="42" r="18" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="62" cy="42" r="9.36" fill="#007a52" fill-opacity="0.75"/><text x="62" y="45" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L1</text><line x1="26" y1="82" x2="44" y2="82" stroke="#374151" stroke-width="1.5"/><line x1="26" y1="77" x2="26" y2="87" stroke="#374151" stroke-width="1.5"/><line x1="26" y1="110" x2="62" y2="110" stroke="#6b7280" stroke-width="0.8"/><line x1="26" y1="107" x2="26" y2="113" stroke="#6b7280" stroke-width="0.8"/><line x1="62" y1="107" x2="62" y2="113" stroke="#6b7280" stroke-width="0.8"/><text x="44.0" y="106" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">d</text><circle cx="62" cy="82" r="18" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="62" cy="82" r="9.36" fill="#b45309" fill-opacity="0.75"/><text x="62" y="85" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L2</text><line x1="26" y1="122" x2="44" y2="122" stroke="#374151" stroke-width="1.5"/><line x1="26" y1="117" x2="26" y2="127" stroke="#374151" stroke-width="1.5"/><line x1="26" y1="150" x2="62" y2="150" stroke="#6b7280" stroke-width="0.8"/><line x1="26" y1="147" x2="26" y2="153" stroke="#6b7280" stroke-width="0.8"/><line x1="62" y1="147" x2="62" y2="153" stroke="#6b7280" stroke-width="0.8"/><text x="44.0" y="146" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">d</text><circle cx="62" cy="122" r="18" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="62" cy="122" r="9.36" fill="#c94a1a" fill-opacity="0.75"/><text x="62" y="125" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L3</text><text x="155" y="122" text-anchor="start" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">Table 9 · near wall · conduit / clipped</text> </svg>`},
+  "mc-horiz": {title:"Free air \u00b7 MC \u00b7 Horizontal formation",caption:"Multi-core cables horizontal on tray/ladder with clearance d.",svg:`<svg viewBox="0 0 290 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#f8f9fa;border-radius:4px;border:1px solid rgba(0,0,0,0.1)">   <defs>     <pattern id="gr" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">       <path d="M16 0L0 0 0 16" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.5"/>     </pattern>     <pattern id="soil_hatch" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">       <line x1="0" y1="8" x2="8" y2="0" stroke="#a07840" stroke-width="0.6" opacity="0.5"/>     </pattern>   </defs>   <rect width="290" height="130" fill="#f8f9fa"/>   <rect width="290" height="130" fill="url(#gr)"/>   <line x1="20" y1="102" x2="270" y2="102" stroke="#374151" stroke-width="2"/><rect x="20" y="102" width="250" height="10" fill="url(#soil_hatch)" opacity="0.4"/><text x="22" y="97" font-family="DM Mono,monospace" font-size="7" fill="#6b7280">≥ 2 cm</text><line x1="80" y1="48" x2="88" y2="48" stroke="#6b7280" stroke-width="0.8"/><line x1="80" y1="45" x2="80" y2="51" stroke="#6b7280" stroke-width="0.8"/><line x1="88" y1="45" x2="88" y2="51" stroke="#6b7280" stroke-width="0.8"/><text x="84.0" y="44" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">d</text><line x1="128" y1="48" x2="136" y2="48" stroke="#6b7280" stroke-width="0.8"/><line x1="128" y1="45" x2="128" y2="51" stroke="#6b7280" stroke-width="0.8"/><line x1="136" y1="45" x2="136" y2="51" stroke="#6b7280" stroke-width="0.8"/><text x="132.0" y="44" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">d</text><circle cx="60" cy="72" r="20" fill="#1a6fc4" fill-opacity="0.10" stroke="#1a6fc4" stroke-width="2"/><circle cx="60" cy="72" r="11.6" fill="#1a6fc4" fill-opacity="0.70"/><circle cx="60" cy="72" r="4.06" fill="#ffffff" fill-opacity="0.5"/><circle cx="108" cy="72" r="20" fill="#1a6fc4" fill-opacity="0.10" stroke="#1a6fc4" stroke-width="2"/><circle cx="108" cy="72" r="11.6" fill="#1a6fc4" fill-opacity="0.70"/><circle cx="108" cy="72" r="4.06" fill="#ffffff" fill-opacity="0.5"/><circle cx="156" cy="72" r="20" fill="#1a6fc4" fill-opacity="0.10" stroke="#1a6fc4" stroke-width="2"/><circle cx="156" cy="72" r="11.6" fill="#1a6fc4" fill-opacity="0.70"/><circle cx="156" cy="72" r="4.06" fill="#ffffff" fill-opacity="0.5"/><circle cx="204" cy="72" r="20" fill="#1a6fc4" fill-opacity="0.10" stroke="#1a6fc4" stroke-width="2"/><circle cx="204" cy="72" r="11.6" fill="#1a6fc4" fill-opacity="0.70"/><circle cx="204" cy="72" r="4.06" fill="#ffffff" fill-opacity="0.5"/><text x="145" y="122" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#6b7280" font-weight="400">Table 11 · MC · horizontal · free air</text> </svg>`},
+  "mc-wall": {title:"Free air \u00b7 MC \u00b7 Touching wall",caption:"Multi-core cables stacked vertically touching wall.",svg:`<svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#f8f9fa;border-radius:4px;border:1px solid rgba(0,0,0,0.1)">   <defs>     <pattern id="gr" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">       <path d="M16 0L0 0 0 16" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.5"/>     </pattern>     <pattern id="soil_hatch" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">       <line x1="0" y1="8" x2="8" y2="0" stroke="#a07840" stroke-width="0.6" opacity="0.5"/>     </pattern>   </defs>   <rect width="240" height="160" fill="#f8f9fa"/>   <rect width="240" height="160" fill="url(#gr)"/>   <rect x="14" y="10" width="12" height="135" fill="#d1d5db"/><rect x="14" y="10" width="12" height="135" fill="url(#soil_hatch)"/><line x1="26" y1="10" x2="26" y2="145" stroke="#374151" stroke-width="1.5"/><text x="12" y="8" text-anchor="start" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">WALL</text><circle cx="44" cy="38" r="18" fill="#1a6fc4" fill-opacity="0.10" stroke="#1a6fc4" stroke-width="2"/><circle cx="44" cy="38" r="10.44" fill="#1a6fc4" fill-opacity="0.70"/><circle cx="44" cy="38" r="3.6539999999999995" fill="#ffffff" fill-opacity="0.5"/><circle cx="44" cy="78" r="18" fill="#1a6fc4" fill-opacity="0.10" stroke="#1a6fc4" stroke-width="2"/><circle cx="44" cy="78" r="10.44" fill="#1a6fc4" fill-opacity="0.70"/><circle cx="44" cy="78" r="3.6539999999999995" fill="#ffffff" fill-opacity="0.5"/><circle cx="44" cy="118" r="18" fill="#1a6fc4" fill-opacity="0.10" stroke="#1a6fc4" stroke-width="2"/><circle cx="44" cy="118" r="10.44" fill="#1a6fc4" fill-opacity="0.70"/><circle cx="44" cy="118" r="3.6539999999999995" fill="#ffffff" fill-opacity="0.5"/><text x="130" y="145" text-anchor="start" font-family="DM Mono,monospace" font-size="8" fill="#6b7280" font-weight="400">Table 12 · MC touching wall</text><text x="130" y="156" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" text-anchor="start">cables touch each other &amp; wall</text> </svg>`},
+};
+
+/* ── K3 SVG DIAGRAMS — engineering precision style */
+const K3_SVG = [
+  {title:"Ducts / enclosed trenches",caption:"Cables in conduits inside enclosed trench \u2014 restricted airflow. Apply k\u2083 = 0.90\u20130.95.",svg:`<svg viewBox="0 0 310 155" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#f8f9fa;border-radius:4px;border:1px solid rgba(0,0,0,0.1)">   <defs>     <pattern id="gr" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">       <path d="M16 0L0 0 0 16" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.5"/>     </pattern>     <pattern id="soil_hatch" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">       <line x1="0" y1="8" x2="8" y2="0" stroke="#a07840" stroke-width="0.6" opacity="0.5"/>     </pattern>   </defs>   <rect width="310" height="155" fill="#f8f9fa"/>   <rect width="310" height="155" fill="url(#gr)"/>   <rect x="0" y="0" width="310" height="46" fill="#dbeafe"/><rect x="0" y="46" width="310" height="109" fill="#c9a96e"/><rect x="0" y="46" width="310" height="109" fill="url(#soil_hatch)"/><line x1="0" y1="46" x2="310" y2="46" stroke="#374151" stroke-width="1" stroke-dasharray="4,3"/><text x="14" y="28" text-anchor="start" font-family="DM Mono,monospace" font-size="8" fill="#1a6fc4" font-weight="400">SURFACE</text><rect x="50" y="58" width="210" height="90" fill="#ffffff" fill-opacity="0.85" stroke="#374151" stroke-width="2" rx="1"/><text x="155" y="70" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">ENCLOSED DUCT / TRENCH</text><text x="155" y="80" text-anchor="middle" font-family="DM Mono,monospace" font-size="6.5" fill="#c94a1a">circulation of air is restricted</text><circle cx="75" cy="95" r="19" fill="none" stroke="#374151" stroke-width="2"/><circle cx="75" cy="95" r="13" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="75" cy="95" r="6.76" fill="#007a52" fill-opacity="0.75"/><text x="75" y="98" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L1</text><circle cx="119" cy="95" r="19" fill="none" stroke="#374151" stroke-width="2"/><circle cx="119" cy="95" r="13" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="119" cy="95" r="6.76" fill="#b45309" fill-opacity="0.75"/><text x="119" y="98" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L2</text><circle cx="163" cy="95" r="19" fill="none" stroke="#374151" stroke-width="2"/><circle cx="163" cy="95" r="13" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="163" cy="95" r="6.76" fill="#c94a1a" fill-opacity="0.75"/><text x="163" y="98" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#ffffff" font-weight="600">L3</text><text x="155" y="143" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#6b7280" font-weight="400">Table 9 sub · k₃ ducts/trenches · 0.90–0.95</text> </svg>`},
+  {title:"Multiple cable layers in tray",caption:"Stacking cables in multiple layers traps heat from inner layers. Each layer beyond the first requires an additional k\u2083 penalty of 0.85\u20130.95.",svg:`<svg viewBox="0 0 310 175" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#f8f9fa;border-radius:4px;border:1px solid rgba(0,0,0,0.1)">   <defs>     <pattern id="gr" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">       <path d="M16 0L0 0 0 16" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.5"/>     </pattern>     <pattern id="soil_hatch" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">       <line x1="0" y1="8" x2="8" y2="0" stroke="#a07840" stroke-width="0.6" opacity="0.5"/>     </pattern>   </defs>   <rect width="310" height="175" fill="#f8f9fa"/>   <rect width="310" height="175" fill="url(#gr)"/>   <rect x="24" y="56" width="6" height="100" fill="#374151" fill-opacity="0.5" rx="1"/><rect x="178" y="56" width="6" height="100" fill="#374151" fill-opacity="0.5" rx="1"/><rect x="24" y="152" width="160" height="8" fill="#374151" fill-opacity="0.5" rx="1"/><circle cx="47" cy="148" r="11" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="47" cy="148" r="5.720000000000001" fill="#c94a1a" fill-opacity="0.75"/><circle cx="71" cy="148" r="11" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="71" cy="148" r="5.720000000000001" fill="#c94a1a" fill-opacity="0.75"/><circle cx="95" cy="148" r="11" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="95" cy="148" r="5.720000000000001" fill="#c94a1a" fill-opacity="0.75"/><circle cx="119" cy="148" r="11" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="119" cy="148" r="5.720000000000001" fill="#c94a1a" fill-opacity="0.75"/><circle cx="143" cy="148" r="11" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="143" cy="148" r="5.720000000000001" fill="#c94a1a" fill-opacity="0.75"/><circle cx="167" cy="148" r="11" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="1.4"/><circle cx="167" cy="148" r="5.720000000000001" fill="#c94a1a" fill-opacity="0.75"/><text x="197" y="151" text-anchor="start" font-family="DM Mono,monospace" font-size="7" fill="#c94a1a" font-weight="400">Layer 1 — bottom (hottest)</text><circle cx="47" cy="126" r="11" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="47" cy="126" r="5.720000000000001" fill="#b45309" fill-opacity="0.75"/><circle cx="71" cy="126" r="11" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="71" cy="126" r="5.720000000000001" fill="#b45309" fill-opacity="0.75"/><circle cx="95" cy="126" r="11" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="95" cy="126" r="5.720000000000001" fill="#b45309" fill-opacity="0.75"/><circle cx="119" cy="126" r="11" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="119" cy="126" r="5.720000000000001" fill="#b45309" fill-opacity="0.75"/><circle cx="143" cy="126" r="11" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="143" cy="126" r="5.720000000000001" fill="#b45309" fill-opacity="0.75"/><circle cx="167" cy="126" r="11" fill="#b45309" fill-opacity="0.10" stroke="#b45309" stroke-width="1.4"/><circle cx="167" cy="126" r="5.720000000000001" fill="#b45309" fill-opacity="0.75"/><text x="197" y="129" text-anchor="start" font-family="DM Mono,monospace" font-size="7" fill="#b45309" font-weight="400">Layer 2</text><circle cx="47" cy="104" r="11" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="47" cy="104" r="5.720000000000001" fill="#007a52" fill-opacity="0.75"/><circle cx="71" cy="104" r="11" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="71" cy="104" r="5.720000000000001" fill="#007a52" fill-opacity="0.75"/><circle cx="95" cy="104" r="11" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="95" cy="104" r="5.720000000000001" fill="#007a52" fill-opacity="0.75"/><circle cx="119" cy="104" r="11" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="119" cy="104" r="5.720000000000001" fill="#007a52" fill-opacity="0.75"/><circle cx="143" cy="104" r="11" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="143" cy="104" r="5.720000000000001" fill="#007a52" fill-opacity="0.75"/><circle cx="167" cy="104" r="11" fill="#007a52" fill-opacity="0.10" stroke="#007a52" stroke-width="1.4"/><circle cx="167" cy="104" r="5.720000000000001" fill="#007a52" fill-opacity="0.75"/><text x="197" y="107" text-anchor="start" font-family="DM Mono,monospace" font-size="7" fill="#007a52" font-weight="400">Layer 3 — top</text><text x="155" y="168" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#6b7280" font-weight="400">Multiple layers · each additional layer requires k₃ derating</text> </svg>`},
+  {title:"Low ventilation environment",caption:"Ceiling voids, service shafts, enclosed plant rooms \u2014 stagnant air traps heat. Apply k\u2083 \u2248 0.90.",svg:`<svg viewBox="0 0 310 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#f8f9fa;border-radius:4px;border:1px solid rgba(0,0,0,0.1)">   <defs>     <pattern id="gr" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">       <path d="M16 0L0 0 0 16" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.5"/>     </pattern>     <pattern id="soil_hatch" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">       <line x1="0" y1="8" x2="8" y2="0" stroke="#a07840" stroke-width="0.6" opacity="0.5"/>     </pattern>   </defs>   <rect width="310" height="160" fill="#f8f9fa"/>   <rect width="310" height="160" fill="url(#gr)"/>   <rect x="12" y="12" width="286" height="132" fill="#ffffff" stroke="#374151" stroke-width="1.5" rx="4"/><rect x="12" y="12" width="286" height="22" fill="#d1d5db" rx="2"/><text x="155" y="27" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="#374151" font-weight="600">ENCLOSED VOID / CEILING / SHAFT / PLANT ROOM</text><text x="40" y="58" font-family="DM Mono,monospace" font-size="9" fill="#c94a1a" opacity="0.8">✕ no convection</text><text x="185" y="58" font-family="DM Mono,monospace" font-size="9" fill="#c94a1a" opacity="0.8">✕ stagnant air</text><circle cx="95" cy="98" r="18" fill="#1a6fc4" fill-opacity="0.10" stroke="#1a6fc4" stroke-width="2"/><circle cx="95" cy="98" r="10.44" fill="#1a6fc4" fill-opacity="0.70"/><circle cx="95" cy="98" r="3.6539999999999995" fill="#ffffff" fill-opacity="0.5"/><circle cx="155" cy="98" r="18" fill="#1a6fc4" fill-opacity="0.10" stroke="#1a6fc4" stroke-width="2"/><circle cx="155" cy="98" r="10.44" fill="#1a6fc4" fill-opacity="0.70"/><circle cx="155" cy="98" r="3.6539999999999995" fill="#ffffff" fill-opacity="0.5"/><circle cx="215" cy="98" r="18" fill="#1a6fc4" fill-opacity="0.10" stroke="#1a6fc4" stroke-width="2"/><circle cx="215" cy="98" r="10.44" fill="#1a6fc4" fill-opacity="0.70"/><circle cx="215" cy="98" r="3.6539999999999995" fill="#ffffff" fill-opacity="0.5"/><ellipse cx="95" cy="68" rx="12" ry="7" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="0.8" stroke-opacity="0.4"/><text x="95" y="71" text-anchor="middle" font-family="serif" font-size="10" fill="#c94a1a" opacity="0.6">♨</text><ellipse cx="155" cy="68" rx="12" ry="7" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="0.8" stroke-opacity="0.4"/><text x="155" y="71" text-anchor="middle" font-family="serif" font-size="10" fill="#c94a1a" opacity="0.6">♨</text><ellipse cx="215" cy="68" rx="12" ry="7" fill="#c94a1a" fill-opacity="0.10" stroke="#c94a1a" stroke-width="0.8" stroke-opacity="0.4"/><text x="215" y="71" text-anchor="middle" font-family="serif" font-size="10" fill="#c94a1a" opacity="0.6">♨</text><text x="155" y="128" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#c94a1a" font-weight="400">heat trapped — inadequate cooling</text><text x="155" y="140" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="#6b7280" font-weight="400">k₃ ≈ 0.90 — ceiling voids · shafts · enclosed plant rooms</text> </svg>`},
+  {title:"Harmonic currents \u2014 3-phase 4-wire",caption:"Triplen harmonics (3rd, 9th, 15th\u2026) are in-phase and accumulate in the neutral conductor, causing extra heating. Apply k\u2083 \u2248 0.95 for non-linear loads (VFD, UPS, data centres).",svg:`<svg viewBox="0 0 310 175" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;background:#f8f9fa;border-radius:4px;border:1px solid rgba(0,0,0,0.1)">   <defs>     <pattern id="gr" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">       <path d="M16 0L0 0 0 16" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="0.5"/>     </pattern>     <pattern id="soil_hatch" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">       <line x1="0" y1="8" x2="8" y2="0" stroke="#a07840" stroke-width="0.6" opacity="0.5"/>     </pattern>   </defs>   <rect width="310" height="175" fill="#f8f9fa"/>   <rect width="310" height="175" fill="url(#gr)"/>   <text x="14" y="18" text-anchor="start" font-family="DM Mono,monospace" font-size="7" fill="#374151" font-weight="600">3-PHASE 4-WIRE  ·  NON-LINEAR LOADS  (VFD / UPS / DATA CENTRE)</text><text x="14" y="36" text-anchor="start" font-family="DM Mono,monospace" font-size="8" fill="#007a52" font-weight="400">L1</text><line x1="60" y1="38" x2="296" y2="38" stroke="rgba(0,0,0,0.06)" stroke-width="0.8"/><polyline points="60.0,38.0 62.0,36.9 64.0,35.9 65.9,34.9 67.9,33.9 69.9,33.0 71.9,32.1 73.9,31.3 75.9,30.5 77.8,29.9 79.8,29.3 81.8,28.8 83.8,28.5 85.8,28.2 87.8,28.0 89.7,28.0 91.7,28.1 93.7,28.3 95.7,28.5 97.7,28.9 99.7,29.4 101.6,30.0 103.6,30.7 105.6,31.5 107.6,32.3 109.6,33.2 111.6,34.1 113.5,35.1 115.5,36.2 117.5,37.2 119.5,38.3 121.5,39.3 123.5,40.4 125.4,41.4 127.4,42.3 129.4,43.3 131.4,44.1 133.4,44.9 135.4,45.7 137.3,46.3 139.3,46.8 141.3,47.3 143.3,47.6 145.3,47.9 147.3,48.0 149.2,48.0 151.2,47.9 153.2,47.7 155.2,47.4 157.2,47.0 159.2,46.4 161.1,45.8 163.1,45.1 165.1,44.3 167.1,43.5 169.1,42.6 171.1,41.6 173.0,40.6 175.0,39.6 177.0,38.5 179.0,37.5 181.0,36.4 183.0,35.4 184.9,34.4 186.9,33.4 188.9,32.5 190.9,31.7 192.9,30.9 194.9,30.2 196.8,29.6 198.8,29.0 200.8,28.6 202.8,28.3 204.8,28.1 206.8,28.0 208.7,28.0 210.7,28.1 212.7,28.4 214.7,28.7 216.7,29.2 218.7,29.7 220.6,30.3 222.6,31.1 224.6,31.9 226.6,32.7 228.6,33.7 230.6,34.6 232.5,35.6 234.5,36.7 236.5,37.7 238.5,38.8 240.5,39.8 242.5,40.9 244.4,41.9 246.4,42.8 248.4,43.7 250.4,44.5 252.4,45.3 254.4,46.0 256.3,46.6 258.3,47.1 260.3,47.5 262.3,47.7 264.3,47.9 266.3,48.0 268.2,48.0 270.2,47.8 272.2,47.5 274.2,47.2 276.2,46.7 278.2,46.1 280.1,45.5 282.1,44.7 284.1,43.9 286.1,43.0 288.1,42.1 290.1,41.1 292.0,40.1 294.0,39.1 296.0,38.0" fill="none" stroke="#007a52" stroke-width="1.5"/><text x="14" y="68" text-anchor="start" font-family="DM Mono,monospace" font-size="8" fill="#b45309" font-weight="400">L2</text><line x1="60" y1="70" x2="296" y2="70" stroke="rgba(0,0,0,0.06)" stroke-width="0.8"/><polyline points="60.0,70.0 62.0,68.9 64.0,67.9 65.9,66.9 67.9,65.9 69.9,65.0 71.9,64.1 73.9,63.3 75.9,62.5 77.8,61.9 79.8,61.3 81.8,60.8 83.8,60.5 85.8,60.2 87.8,60.0 89.7,60.0 91.7,60.1 93.7,60.3 95.7,60.5 97.7,60.9 99.7,61.4 101.6,62.0 103.6,62.7 105.6,63.5 107.6,64.3 109.6,65.2 111.6,66.1 113.5,67.1 115.5,68.2 117.5,69.2 119.5,70.3 121.5,71.3 123.5,72.4 125.4,73.4 127.4,74.3 129.4,75.3 131.4,76.1 133.4,76.9 135.4,77.7 137.3,78.3 139.3,78.8 141.3,79.3 143.3,79.6 145.3,79.9 147.3,80.0 149.2,80.0 151.2,79.9 153.2,79.7 155.2,79.4 157.2,79.0 159.2,78.4 161.1,77.8 163.1,77.1 165.1,76.3 167.1,75.5 169.1,74.6 171.1,73.6 173.0,72.6 175.0,71.6 177.0,70.5 179.0,69.5 181.0,68.4 183.0,67.4 184.9,66.4 186.9,65.4 188.9,64.5 190.9,63.7 192.9,62.9 194.9,62.2 196.8,61.6 198.8,61.0 200.8,60.6 202.8,60.3 204.8,60.1 206.8,60.0 208.7,60.0 210.7,60.1 212.7,60.4 214.7,60.7 216.7,61.2 218.7,61.7 220.6,62.3 222.6,63.1 224.6,63.9 226.6,64.7 228.6,65.7 230.6,66.6 232.5,67.6 234.5,68.7 236.5,69.7 238.5,70.8 240.5,71.8 242.5,72.9 244.4,73.9 246.4,74.8 248.4,75.7 250.4,76.5 252.4,77.3 254.4,78.0 256.3,78.6 258.3,79.1 260.3,79.5 262.3,79.7 264.3,79.9 266.3,80.0 268.2,80.0 270.2,79.8 272.2,79.5 274.2,79.2 276.2,78.7 278.2,78.1 280.1,77.5 282.1,76.7 284.1,75.9 286.1,75.0 288.1,74.1 290.1,73.1 292.0,72.1 294.0,71.1 296.0,70.0" fill="none" stroke="#b45309" stroke-width="1.5"/><text x="14" y="100" text-anchor="start" font-family="DM Mono,monospace" font-size="8" fill="#c94a1a" font-weight="400">L3</text><line x1="60" y1="102" x2="296" y2="102" stroke="rgba(0,0,0,0.06)" stroke-width="0.8"/><polyline points="60.0,102.0 62.0,100.9 64.0,99.9 65.9,98.9 67.9,97.9 69.9,97.0 71.9,96.1 73.9,95.3 75.9,94.5 77.8,93.9 79.8,93.3 81.8,92.8 83.8,92.5 85.8,92.2 87.8,92.0 89.7,92.0 91.7,92.1 93.7,92.3 95.7,92.5 97.7,92.9 99.7,93.4 101.6,94.0 103.6,94.7 105.6,95.5 107.6,96.3 109.6,97.2 111.6,98.1 113.5,99.1 115.5,100.2 117.5,101.2 119.5,102.3 121.5,103.3 123.5,104.4 125.4,105.4 127.4,106.3 129.4,107.3 131.4,108.1 133.4,108.9 135.4,109.7 137.3,110.3 139.3,110.8 141.3,111.3 143.3,111.6 145.3,111.9 147.3,112.0 149.2,112.0 151.2,111.9 153.2,111.7 155.2,111.4 157.2,111.0 159.2,110.4 161.1,109.8 163.1,109.1 165.1,108.3 167.1,107.5 169.1,106.6 171.1,105.6 173.0,104.6 175.0,103.6 177.0,102.5 179.0,101.5 181.0,100.4 183.0,99.4 184.9,98.4 186.9,97.4 188.9,96.5 190.9,95.7 192.9,94.9 194.9,94.2 196.8,93.6 198.8,93.0 200.8,92.6 202.8,92.3 204.8,92.1 206.8,92.0 208.7,92.0 210.7,92.1 212.7,92.4 214.7,92.7 216.7,93.2 218.7,93.7 220.6,94.3 222.6,95.1 224.6,95.9 226.6,96.7 228.6,97.7 230.6,98.6 232.5,99.6 234.5,100.7 236.5,101.7 238.5,102.8 240.5,103.8 242.5,104.9 244.4,105.9 246.4,106.8 248.4,107.7 250.4,108.5 252.4,109.3 254.4,110.0 256.3,110.6 258.3,111.1 260.3,111.5 262.3,111.7 264.3,111.9 266.3,112.0 268.2,112.0 270.2,111.8 272.2,111.5 274.2,111.2 276.2,110.7 278.2,110.1 280.1,109.5 282.1,108.7 284.1,107.9 286.1,107.0 288.1,106.1 290.1,105.1 292.0,104.1 294.0,103.1 296.0,102.0" fill="none" stroke="#c94a1a" stroke-width="1.5"/><text x="14" y="132" text-anchor="start" font-family="DM Mono,monospace" font-size="8" fill="#1a6fc4" font-weight="600">N  (neutral)</text><line x1="60" y1="134" x2="296" y2="134" stroke="rgba(0,0,0,0.06)" stroke-width="0.8"/><polyline points="60.0,134.0 62.0,131.5 64.0,129.3 65.9,127.5 67.9,126.4 69.9,126.0 71.9,126.4 73.9,127.6 75.9,129.4 77.8,131.7 79.8,134.2 81.8,136.7 83.8,138.9 85.8,140.6 87.8,141.7 89.7,142.0 91.7,141.5 93.7,140.3 95.7,138.4 97.7,136.1 99.7,133.6 101.6,131.1 103.6,128.9 105.6,127.3 107.6,126.3 109.6,126.0 111.6,126.6 113.5,127.9 115.5,129.8 117.5,132.1 119.5,134.6 121.5,137.1 123.5,139.2 125.4,140.9 127.4,141.8 129.4,142.0 131.4,141.3 133.4,140.0 135.4,138.0 137.3,135.7 139.3,133.2 141.3,130.7 143.3,128.6 145.3,127.0 147.3,126.2 149.2,126.1 151.2,126.7 153.2,128.2 155.2,130.2 157.2,132.5 159.2,135.1 161.1,137.5 163.1,139.5 165.1,141.1 167.1,141.9 169.1,141.9 171.1,141.2 173.0,139.7 175.0,137.7 177.0,135.3 179.0,132.7 181.0,130.3 183.0,128.3 184.9,126.8 186.9,126.1 188.9,126.1 190.9,126.9 192.9,128.5 194.9,130.5 196.8,132.9 198.8,135.5 200.8,137.8 202.8,139.8 204.8,141.3 206.8,141.9 208.7,141.8 210.7,141.0 212.7,139.4 214.7,137.3 216.7,134.8 218.7,132.3 220.6,130.0 222.6,128.0 224.6,126.7 226.6,126.0 228.6,126.2 230.6,127.1 232.5,128.8 234.5,130.9 236.5,133.4 238.5,135.9 240.5,138.2 242.5,140.1 244.4,141.4 246.4,142.0 248.4,141.7 250.4,140.7 252.4,139.1 254.4,136.9 256.3,134.4 258.3,131.9 260.3,129.6 262.3,127.7 264.3,126.5 266.3,126.0 268.2,126.3 270.2,127.4 272.2,129.1 274.2,131.3 276.2,133.8 278.2,136.3 280.1,138.6 282.1,140.4 284.1,141.6 286.1,142.0 288.1,141.6 290.1,140.5 292.0,138.7 294.0,136.5 296.0,134.0" fill="none" stroke="#1a6fc4" stroke-width="2"/><text x="14" y="170" text-anchor="start" font-family="DM Mono,monospace" font-size="7" fill="#6b7280" font-weight="400">neutral carries sum of triplen harmonics → overheating risk → apply k₃ ≈ 0.95</text> </svg>`},
+];
+
+/* ================================================================
+   AMPACITY LOOKUP — columns (a)-(f) per cable type
+   col index: 0=(a) 1=(b) 2=(c) 3=(d) 4=(e) 5=(f)
+   ================================================================ */
+
+/* Ampacity tables indexed by [cableType][sizeIndex][colIndex]
+   All data per IEC 60502-1 / IEC 60364-5-52 */
+const AMP_COLS = {
+  // ── 1C CU PVC (70°C) ──────────────────────────────────────────
+  "1C-CU-PVC": {
+    sizes:[1.5,2.5,4,6,10,16,25,35,50,70,95,120,150,185,240,300,400,500,630,800,1000],
+    //      (a)   (b)   (c)   (d)   (e)   (f)
+    cols: [[22,   22,   16,   17,   17,   23 ],
+           [29,   29,   21,   23,   23,   30 ],
+           [37,   37,   28,   30,   31,   40 ],
+           [46,   46,   34,   38,   39,   50 ],
+           [61,   61,   46,   52,   53,   68 ],
+           [79,   79,   60,   69,   70,   90 ],
+           [101,  101,  78,   92,   94,   119],
+           [121,  121,  94,   113,  116,  147],
+           [143,  143,  114,  138,  142,  178],
+           [175,  175,  141,  175,  180,  225],
+           [209,  209,  172,  216,  223,  276],
+           [236,  237,  197,  251,  258,  320],
+           [265,  266,  224,  289,  298,  367],
+           [300,  300,  256,  335,  345,  423],
+           [346,  346,  300,  398,  410,  502],
+           [389,  389,  341,  460,  474,  581],
+           [437,  437,  389,  532,  548,  674],
+           [490,  490,  442,  614,  632,  785],
+           [544,  548,  496,  700,  722,  910],
+           [596,  596,  549,  787,  812,  1042],
+           [652,  655,  608,  909,  941,  1229]]
+  },
+  // ── 1C CU XLPE (90°C) ─────────────────────────────────────────
+  "1C-CU-XLPE": {
+    sizes:[1.5,2.5,4,6,10,16,25,35,50,70,95,120,150,185,240,300,400,500,630,800,1000],
+    cols: [[27,   28,   20,   23,   23,   31 ],
+           [36,   36,   26,   30,   31,   40 ],
+           [46,   46,   34,   40,   41,   53 ],
+           [57,   57,   42,   50,   52,   68 ],
+           [75,   75,   56,   68,   70,   91 ],
+           [97,   97,   73,   91,   93,   121],
+           [124,  124,  96,   122,  125,  161],
+           [149,  149,  117,  150,  154,  198],
+           [175,  176,  140,  183,  189,  240],
+           [214,  215,  174,  233,  240,  304],
+           [257,  256,  212,  288,  297,  374],
+           [291,  292,  243,  335,  346,  434],
+           [327,  327,  277,  388,  400,  499],
+           [369,  369,  316,  450,  464,  577],
+           [425,  426,  371,  536,  553,  688],
+           [479,  473,  422,  620,  641,  797],
+           [539,  540,  482,  720,  743,  928],
+           [604,  606,  549,  834,  862,  1084],
+           [674,  673,  619,  955,  986,  1257],
+           [739,  741,  688,  1078, 1116, 1440],
+           [807,  808,  766,  1234, 1276, 1674]]
+  },
+  // ── 1C AL PVC (70°C) ──────────────────────────────────────────
+  "1C-AL-PVC": {
+    sizes:[10,16,25,35,50,70,95,120,150,185,240,300,400,500,630,800,1000],
+    cols: [[48,   49,   36,   41,   42,   54 ],
+           [61,   61,   46,   53,   55,   70 ],
+           [78,   78,   61,   71,   73,   93 ],
+           [94,   94,   73,   88,   90,   114],
+           [111,  111,  88,   107,  110,  138],
+           [136,  136,  110,  136,  140,  174],
+           [162,  163,  133,  168,  173,  214],
+           [184,  185,  153,  195,  201,  249],
+           [206,  207,  174,  225,  232,  285],
+           [235,  234,  200,  262,  270,  329],
+           [272,  272,  235,  313,  322,  392],
+           [307,  307,  270,  363,  375,  454],
+           [350,  350,  311,  426,  439,  531],
+           [398,  399,  359,  499,  514,  625],
+           [451,  451,  411,  580,  598,  733],
+           [503,  503,  464,  665,  686,  852],
+           [561,  563,  523,  782,  809,  1022]]
+  },
+  // ── 1C AL XLPE (90°C) ─────────────────────────────────────────
+  "1C-AL-XLPE": {
+    sizes:[10,16,25,35,50,70,95,120,150,185,240,300,400,500,630,800,1000],
+    cols: [[60,   60,   45,   54,   55,   72 ],
+           [75,   75,   57,   70,   72,   94 ],
+           [96,   96,   75,   94,   97,   125],
+           [116,  116,  90,   116,  120,  153],
+           [136,  136,  109,  142,  146,  186],
+           [166,  167,  135,  181,  186,  236],
+           [199,  199,  164,  224,  230,  290],
+           [226,  227,  189,  261,  269,  337],
+           [254,  254,  215,  301,  311,  387],
+           [288,  288,  247,  351,  362,  449],
+           [333,  335,  291,  421,  434,  536],
+           [378,  378,  333,  489,  505,  622],
+           [430,  431,  385,  575,  594,  730],
+           [490,  492,  445,  676,  699,  861],
+           [557,  556,  511,  789,  815,  1008],
+           [622,  623,  579,  907,  938,  1171],
+           [692,  693,  657,  1058, 1094, 1386]]
+  },
+  // ── MC CU PVC (70°C) — cols: gnd-trefoil, gnd-flat, gnd-duct, air-single, air-flat, air-spaced
+  "MC-CU-PVC": {
+    sizes:[1.5,2.5,4,6,10,16,25,35,50,70,95,120,150,185,240,300,400,500],
+    cols: [[23,  19,  18,  18,  18,  18 ],
+           [29,  20,  20,  23,  23,  23 ],
+           [38,  26,  26,  32,  32,  32 ],
+           [48,  33,  33,  40,  40,  40 ],
+           [63,  43,  43,  55,  55,  55 ],
+           [81,  57,  57,  72,  72,  72 ],
+           [105, 75,  75,  98,  98,  98 ],
+           [117, 85,  85,  107, 107, 107],
+           [139, 103, 103, 131, 131, 131],
+           [170, 128, 128, 166, 166, 166],
+           [204, 156, 156, 204, 204, 204],
+           [231, 178, 178, 235, 235, 235],
+           [259, 203, 203, 270, 270, 270],
+           [292, 232, 232, 311, 311, 311],
+           [338, 272, 272, 370, 370, 370],
+           [381, 310, 310, 426, 426, 426],
+           [431, 357, 357, 495, 495, 495],
+           [484, 405, 405, 568, 568, 568]]
+  },
+  // ── MC CU XLPE (90°C) ─────────────────────────────────────────
+  "MC-CU-XLPE": {
+    sizes:[1.5,2.5,4,6,10,16,25,35,50,70,95,120,150,185,240,300,400,500],
+    cols: [[27,  18,  18,  23,  23,  23 ],
+           [35,  24,  24,  30,  30,  30 ],
+           [46,  31,  31,  40,  40,  40 ],
+           [57,  39,  39,  51,  51,  51 ],
+           [75,  53,  53,  70,  70,  70 ],
+           [97,  69,  69,  93,  93,  93 ],
+           [126, 92,  92,  126, 126, 126],
+           [144, 105, 105, 141, 141, 141],
+           [171, 127, 127, 173, 173, 173],
+           [209, 159, 159, 220, 220, 220],
+           [251, 193, 193, 271, 271, 271],
+           [286, 223, 223, 317, 317, 317],
+           [319, 252, 252, 360, 360, 360],
+           [361, 288, 288, 416, 416, 416],
+           [417, 339, 339, 495, 495, 495],
+           [470, 386, 386, 570, 570, 570],
+           [533, 444, 444, 665, 665, 665],
+           [598, 505, 505, 764, 764, 764]]
+  },
+  // ── MC AL PVC (70°C) ──────────────────────────────────────────
+  "MC-AL-PVC": {
+    sizes:[10,16,25,35,50,70,95,120,150,185,240,300,400,500],
+    cols: [[48,  33,  33,  42,  42,  42 ],
+           [63,  44,  44,  56,  56,  56 ],
+           [81,  58,  58,  76,  76,  76 ],
+           [90,  66,  66,  83,  83,  83 ],
+           [108, 80,  80,  102, 102, 102],
+           [132, 99,  99,  129, 129, 129],
+           [158, 121, 121, 159, 159, 159],
+           [180, 138, 138, 183, 183, 183],
+           [202, 158, 158, 210, 210, 210],
+           [229, 181, 181, 243, 243, 243],
+           [265, 214, 214, 290, 290, 290],
+           [300, 244, 244, 336, 336, 336],
+           [344, 285, 285, 396, 396, 396],
+           [392, 328, 328, 460, 460, 460]]
+  },
+  // ── MC AL XLPE (90°C) ─────────────────────────────────────────
+  "MC-AL-XLPE": {
+    sizes:[10,16,25,35,50,70,95,120,150,185,240,300,400,500],
+    cols: [[58,  41,  41,  53,  53,  53 ],
+           [75,  54,  54,  72,  72,  72 ],
+           [98,  71,  71,  98,  98,  98 ],
+           [111, 82,  82,  109, 109, 109],
+           [133, 99,  99,  134, 134, 134],
+           [163, 123, 123, 171, 171, 171],
+           [195, 150, 150, 210, 210, 210],
+           [222, 173, 173, 246, 246, 246],
+           [248, 196, 196, 280, 280, 280],
+           [282, 225, 225, 325, 325, 325],
+           [327, 265, 265, 388, 388, 388],
+           [370, 304, 304, 449, 449, 449],
+           [424, 354, 354, 530, 530, 530],
+           [484, 408, 408, 618, 618, 618]]
+  }
+};
+
+/* col index → letter label */
+const COL_LETTER = ['a','b','c','d','e','f'];
+
+/* ── Table 5: burial depth factors ──────────────────────────────
+   format: "depth_s70_s95to240_sge300"
+   s70 = ≤70mm², s95-240 = 95-240mm², sge300 = ≥300mm² */
+const DEPTH_FACTORS = {
+  "0.50_1.00_1.00_1.00": [1.00, 1.00, 1.00],
+  "0.60_0.99_0.98_0.97": [0.99, 0.98, 0.97],
+  "0.80_0.97_0.96_0.94": [0.97, 0.96, 0.94],
+  "1.00_0.95_0.93_0.92": [0.95, 0.93, 0.92],
+  "1.25_0.94_0.92_0.89": [0.94, 0.92, 0.89],
+  "1.50_0.93_0.90_0.87": [0.93, 0.90, 0.87],
+  "1.75_0.92_0.89_0.86": [0.92, 0.89, 0.86],
+  "2.00_0.91_0.88_0.85": [0.91, 0.88, 0.85]
+};
+
+function getDepthFactor(key, sizeMm2) {
+  const f = DEPTH_FACTORS[key] || [1,1,1];
+  const s = Number(sizeMm2);
+  if (s <= 70) return f[0];
+  if (s <= 240) return f[1];
+  return f[2];
+}
+
+/* ── Table 6: soil resistivity factors ────────────────────────── */
+const SOIL_FACTORS = {
+  "0.8_1.17":1.17,"0.9_1.12":1.12,"1.0_1.07":1.07,
+  "1.2_1.00":1.00,"1.5_0.91":0.91,"2.0_0.80":0.80,"2.5_0.73":0.73
+};
+
+/* ── k2 grouping tables ────────────────────────────────────────── */
+/* Table 8: buried in ground (trefoil or flat or duct) — SC only
+   Keys: "trefoil-touch"|"flat-touch"|"duct" */
+const K2_T8 = {
+  "trefoil-touch": {1:1,   2:0.77,3:0.66,4:0.60,5:0.56,6:0.53},
+  "flat-touch":    {1:1,   2:0.80,3:0.69,4:0.63,5:0.59,6:0.57},
+  "duct":          {1:1,   2:0.82,3:0.73,4:0.68,5:0.64,6:0.61}
+};
+/* Table 9: SC flat formation free air (ground/troughs/racks/wall) */
+const K2_T9 = {
+  "ground":        {1:0.92,2:0.89,3:0.88},
+  "troughs":       {1:0.92,2:0.89,3:0.88, rows:{1:0.92,2:0.87,3:0.84,6:0.82}},
+  "racks":         {1:1.00,2:0.97,3:0.96, rows:{1:1.00,2:0.97,3:0.96,6:0.94}},
+  "near-wall":     {1:0.94,2:0.91,3:0.89},
+  "on-wall":       {1:0.89,2:0.86,3:0.84},
+  "conduit":       {1:1,   2:0.80,3:0.70,4:0.65,6:0.60,9:0.50}
+};
+/* Table 10: SC trefoil free air */
+const K2_T10 = {
+  "ground":  {1:0.95,2:0.90,3:0.88},
+  "troughs": {1:0.95,2:0.90,3:0.88, rows:{1:0.95,2:0.90,3:0.88,6:0.86}},
+  "racks":   {1:1.00,2:0.98,3:0.96, rows:{1:1.00,2:1.00,3:1.00,6:1.00}},
+  "zero":    {1:1.00,2:1.00,3:1.00}
+};
+/* Table 11: MC horiz/vert free air */
+const K2_T11 = {
+  "ground":  {1:0.95,2:0.90,3:0.88,6:0.85,9:0.84},
+  "troughs": {1:0.95,2:0.90,3:0.88,6:0.85,9:0.84, rows:{1:0.95,2:0.90,3:0.88,6:0.86}},
+  "racks":   {1:1.00,2:0.98,3:0.96,6:0.93,9:0.92},
+  "wall":    {1:1.00,2:0.93,3:0.90,6:0.87,9:0.86},
+  "zero":    {1:1.00,2:1.00,3:1.00,6:1.00,9:1.00}
+};
+/* Table 12: MC touching wall */
+const K2_T12 = {
+  "ground":  {1:0.90,2:0.84,3:0.80,6:0.75,9:0.73},
+  "troughs": {1:0.95,2:0.84,3:0.80,6:0.75,9:0.73},
+  "racks":   {1:0.95,2:0.84,3:0.80,6:0.75,9:0.73},
+  "wall":    {1:0.95,2:0.78,3:0.73,6:0.68,9:0.66}
+};
+
+/* ── CASCADE STATE ─────────────────────────────────────────────── */
+let STATE = {
+  l1: null,   // 'underground' | 'air'
+  l2: null,   // 'direct'|'duct'  (ug)  |  'tray'|'conduit' (air)
+  l3: null,   // formation key
+  colIdx: null,  // 0-5 → col (a)-(f)
+  k2table: null, // table key e.g. 't8'|'t9'|'t10'|'t11'|'t12'
+  k2subkey: null // e.g. 'trefoil-touch'|'racks' etc.
+};
+
+/* L2 options per L1 */
+const L2_OPTIONS = {
+  underground: [
+    {key:'direct', label:'Direct buried'},
+    {key:'duct',   label:'In buried duct / conduit'}
+  ],
+  air: [
+    {key:'tray',    label:'On tray / ladder / brackets'},
+    {key:'conduit', label:'In conduit / trunking / clipped'}
+  ]
+};
+
+/* L3 options per L1+L2, plus col index and k2 info */
+const L3_OPTIONS = {
+  'underground-direct': [
+    {key:'trefoil', label:'Trefoil', col:0, k2t:'t8', k2k:'trefoil-touch'},
+    {key:'flat',    label:'Flat touching', col:1, k2t:'t8', k2k:'flat-touch'}
+  ],
+  'underground-duct': [
+    {key:'trefoil', label:'Trefoil in duct', col:2, k2t:'t8', k2k:'duct'},
+    {key:'flat',    label:'Flat in separate ducts', col:2, k2t:'t8', k2k:'duct'}
+  ],
+  'air-tray': [
+    {key:'trefoil',  label:'Trefoil touching',  col:3, k2t:'auto', k2k:'ground'},
+    {key:'flat-t',   label:'Flat touching',      col:4, k2t:'auto', k2k:'ground'},
+    {key:'flat-s',   label:'Flat spaced ≥1D',   col:5, k2t:'auto', k2k:'racks'}
+  ],
+  'air-conduit': [
+    {key:'single', label:'Single cable', col:3, k2t:'t9', k2k:'conduit'}
+  ]
+};
+
+/* K2 table lookup given cable type (1C/MC) and l2/l3 */
+function resolveK2Table(cableType, l2, l3key, l3option) {
+  const isMC = cableType.startsWith('MC');
+  if (l2 === 'direct' || l2 === 'duct') return {tbl: K2_T8, sub: l3option.k2k, name:'Table 8'};
+  if (l2 === 'conduit') return {tbl: K2_T9, sub:'conduit', name:'Table 9'};
+  // air-tray
+  if (!isMC) {
+    if (l3key === 'trefoil') return {tbl: K2_T10, sub:'racks', name:'Table 10'};
+    return {tbl: K2_T9, sub:'racks', name:'Table 9'};
+  } else {
+    // MC touching wall
+    return {tbl: K2_T11, sub:'racks', name:'Table 11'};
+  }
+}
+
+function getK2fromTable(tblObj, sub, nCircuits) {
+  const row = tblObj[sub] || {};
+  const keys = Object.keys(row).map(Number).sort((a,b)=>a-b);
+  let best = keys[0];
+  for (const k of keys) { if (k <= nCircuits) best = k; }
+  return row[best] ?? 1;
+}
+
+/* ── CASCADE UI FUNCTIONS ──────────────────────────────────────── */
+function setL1(val) {
+  STATE.l1 = val; STATE.l2 = null; STATE.l3 = null; STATE.colIdx = null;
+  document.querySelectorAll('#l1-ug,#l1-air').forEach(b=>b.classList.remove('active'));
+  document.getElementById(val==='underground'?'l1-ug':'l1-air').classList.add('active');
+  // show L2
+  const l2row = document.getElementById('l2-row');
+  l2row.style.display = 'flex';
+  const l2btns = document.getElementById('l2-btns');
+  l2btns.innerHTML = L2_OPTIONS[val].map(o=>
+    `<button class="sel-btn" id="l2-${o.key}" onclick="setL2('${o.key}')">${o.label}</button>`
+  ).join('');
+  document.getElementById('l3-row').style.display = 'none';
+  document.getElementById('icb-display').style.display = 'none';
+  document.getElementById('derate-section').style.display = 'none';
+  calc();
+}
+
+function setL2(val) {
+  STATE.l2 = val; STATE.l3 = null; STATE.colIdx = null;
+  document.querySelectorAll('#l2-btns .sel-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('l2-'+val).classList.add('active');
+  // show L3
+  const l3key = STATE.l1+'-'+val;
+  const opts = L3_OPTIONS[l3key] || [];
+  const l3row = document.getElementById('l3-row');
+  const l3btns = document.getElementById('l3-btns');
+  l3btns.innerHTML = opts.map(o=>
+    `<button class="sel-btn" id="l3-${o.key}" onclick="setL3('${o.key}')">${o.label}</button>`
+  ).join('');
+  l3row.style.display = 'flex';
+  document.getElementById('icb-display').style.display = 'none';
+  document.getElementById('derate-section').style.display = 'none';
+  calc();
+}
+
+function setL3(val) {
+  STATE.l3 = val;
+  const l3key = STATE.l1+'-'+STATE.l2;
+  const opts = L3_OPTIONS[l3key] || [];
+  const opt = opts.find(o=>o.key===val);
+  if (!opt) return;
+  STATE.colIdx = opt.col;
+  document.querySelectorAll('#l3-btns .sel-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('l3-'+val).classList.add('active');
+  document.getElementById('icb-display').style.display = 'flex';
+  document.getElementById('derate-section').style.display = 'block';
+  updateContextualCards();
+  updateK2Illus();
+  calc();
+}
+
+function updateContextualCards() {
+  const ug = STATE.l1 === 'underground';
+  document.getElementById('card-depth').style.display = ug ? 'block' : 'none';
+  document.getElementById('card-soil').style.display  = ug ? 'block' : 'none';
+  // PVC card only if PVC cable
+  const cT = document.getElementById('cableType').value;
+  document.getElementById('card-pvc').style.display = cT.includes('PVC') ? 'block' : 'none';
+}
+
+function updateK2Illus() {
+  if (!STATE.l3) return;
+  const cT = document.getElementById('cableType').value;
+  const isMC = cT.startsWith('MC');
+  // Build exact key from state — matches K2_SVG keys directly
+  let svgKey;
+  if (STATE.l1 === 'underground') {
+    if (STATE.l2 === 'direct') {
+      svgKey = STATE.l3 === 'trefoil' ? 'ug-direct-trefoil' : 'ug-direct-flat';
+    } else { // duct
+      svgKey = STATE.l3 === 'trefoil' ? 'ug-duct-trefoil' : 'ug-duct-flat';
+    }
+  } else { // air
+    if (STATE.l2 === 'conduit') {
+      svgKey = 'air-conduit-single';
+    } else { // tray
+      if (isMC) {
+        svgKey = 'mc-horiz';
+      } else {
+        if (STATE.l3 === 'trefoil') svgKey = 'air-tray-trefoil';
+        else if (STATE.l3 === 'flat-t') svgKey = 'air-tray-flat-t';
+        else svgKey = 'air-tray-flat-s';
+      }
+    }
+  }
+  const d = K2_SVG[svgKey];
+  document.getElementById('k2IllusTag').textContent    = d ? 'Laying arrangement' : 'Installation diagram';
+  document.getElementById('k2IllusTitle').textContent  = d ? d.title   : (svgKey||'');
+  document.getElementById('k2IllusSVG').innerHTML      = d ? d.svg     : '';
+  document.getElementById('k2IllusCaption').textContent= d ? d.caption : '';
+}
+
+/* ── K1 TABLE ───────────────────────────────────────────────────── */
+const K1_TABLE = {
+  air:    {70:{10:1.4,15:1.34,20:1.29,25:1.22,30:1.15,35:1.08,40:1.0,45:0.91,50:0.82,55:0.7,60:0.57},
+           90:{10:1.26,15:1.23,20:1.19,25:1.14,30:1.1,35:1.05,40:1.0,45:0.96,50:0.9,55:0.84,60:0.78}},
+  ground: {70:{10:1.31,15:1.25,20:1.19,25:1.13,30:1.06,35:1.0,40:0.92,45:0.85,50:0.75,55:0.65,60:0.54},
+           90:{10:1.2,15:1.17,20:1.12,25:1.08,30:1.04,35:1.0,40:0.96,45:0.9,50:0.85,55:0.8,60:0.73}}
+};
+
+const CB_SIZES=[1,2,4,6,10,13,16,20,25,32,40,50,63,80,100,125,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3200,4000,5000,6300];
+
+const CABLE_DIAS = {
+  "1C-CU-PVC":  {1.5:6,2.5:6.4,4:7.4,6:7.9,10:8.5,16:9.5,25:11.1,35:12.1,50:13.7,70:15.3,95:17.5,120:18.8,150:20.9,185:23.2,240:26.1,300:29.1,400:32.3,500:36.3,630:40.1,800:44,1000:52.8},
+  "1C-CU-XLPE": {1.5:5.8,2.5:6.2,4:6.8,6:7.3,10:7.9,16:8.9,25:10.5,35:11.5,50:12.9,70:14.7,95:16.5,120:18,150:20.1,185:22.2,240:24.9,300:27.7,400:30.9,500:34.9,630:39.3,800:43.6,1000:52.2},
+  "1C-AL-PVC":  {10:8.5,16:9.5,25:11.1,35:12.1,50:13.7,70:15.3,95:17.5,120:18.8,150:20.9,185:23.2,240:26.1,300:29.1,400:32.3,500:36.3,630:40.1,800:44,1000:52.8},
+  "1C-AL-XLPE": {10:7.9,16:8.9,25:10.5,35:11.5,50:12.9,70:14.7,95:16.5,120:18,150:20.1,185:22.2,240:24.9,300:27.7,400:30.9,500:34.9,630:39.3,800:43.7,1000:52.2}
+};
+
+/* ── K3 (4 remaining situations) ───────────────────────────────── */
+function getK3(){
+  let p=1;
+  for(let i=0;i<4;i++){
+    if(document.getElementById("k3c"+i).checked)
+      p*=parseFloat(document.getElementById("k3v"+i).value)||1;
+  }
+  return p;
+}
+
+function nextCB(a){return CB_SIZES.find(s=>s>=a)||CB_SIZES.at(-1);}
+
+function metric(label,val,unit,state=""){
+  return`<div class="metric ${state}"><div class="metric-label">${label}</div><div class="metric-val">${val}<span class="metric-unit">${unit}</span></div></div>`;
+}
+function chip(ok,yt="PASS",nt="FAIL"){
+  return ok?`<span class="chip chip-ok">${yt}</span>`:`<span class="chip chip-warn">${nt}</span>`;
+}
+function buildCB(sug){
+  const s=document.getElementById("chosenCB"),prev=parseInt(s.value)||0;
+  s.innerHTML=CB_SIZES.map(v=>`<option value="${v}"${v===(prev||sug)?" selected":""}>${v} A</option>`).join("");
+}
+
+/* ── MAIN CALC ──────────────────────────────────────────────────── */
+function calc(){
+  const loadKVA   = parseFloat(document.getElementById("load").value)||0;
+  const pf        = parseFloat(document.getElementById("pf").value)||0.9;
+  const loadKW    = loadKVA*pf;
+  const voltage   = parseFloat(document.getElementById("voltage").value)||400;
+  const length    = parseFloat(document.getElementById("length").value)||0;
+  const phases    = parseInt(document.getElementById("phases").value)||3;
+  const size      = document.getElementById("cableSize").value;
+  const cT        = document.getElementById("cableType").value;
+  const tK1       = document.getElementById("k1Temp").value;
+  const sccKA     = parseFloat(document.getElementById("sccSource").value)||25;
+  const vLim      = parseFloat(document.getElementById("vdropLimit").value)||5;
+  const nC        = parseInt(document.getElementById("numCircuits").value)||1;
+
+  /* ── k3 ── */
+  const k3 = getK3();
+  document.getElementById("k3disp").textContent = k3.toFixed(4);
+
+  /* ── cable impedance ── */
+  const CABLE_DATA_LOCAL = {
+    "1C-CU-PVC": {maxTemp:70,rows:[[1.5,14.4777,0.178],[2.5,8.8661,0.164],[4,5.5159,0.157],[6,3.6853,0.147],[10,2.1897,0.139],[16,1.3762,0.13],[25,0.8702,0.125],[35,0.6274,0.119],[50,0.4637,0.113],[70,0.3217,0.108],[95,0.2324,0.106],[120,0.185,0.103],[150,0.1508,0.102],[185,0.1216,0.101],[240,0.0942,0.1],[300,0.0769,0.098],[400,0.0625,0.097],[500,0.0515,0.095],[630,0.0433,0.093],[800,0.0374,0.092],[1000,0.0333,0.089]]},
+    "1C-CU-XLPE":{maxTemp:90,rows:[[1.5,15.4287,0.175],[2.5,9.4485,0.161],[4,5.8782,0.15],[6,3.9274,0.141],[10,2.3335,0.134],[16,1.4665,0.125],[25,0.9273,0.121],[35,0.6686,0.115],[50,0.4941,0.108],[70,0.3428,0.104],[95,0.2476,0.102],[120,0.197,0.1],[150,0.1605,0.099],[185,0.1294,0.098],[240,0.1002,0.096],[300,0.0817,0.094],[400,0.0663,0.094],[500,0.0545,0.092],[630,0.0454,0.092],[800,0.039,0.091],[1000,0.0346,0.088]]},
+    "1C-AL-PVC": {maxTemp:70,rows:[[10,3.7007,0.139],[16,2.295,0.13],[25,1.442,0.125],[35,1.0432,0.119],[50,0.7706,0.113],[70,0.5329,0.108],[95,0.3854,0.106],[120,0.3052,0.103],[150,0.249,0.102],[185,0.1989,0.101],[240,0.1527,0.1],[300,0.1233,0.098],[400,0.0975,0.097],[500,0.0779,0.095],[630,0.063,0.093],[800,0.0524,0.091],[1000,0.045,0.089]]},
+    "1C-AL-XLPE":{maxTemp:90,rows:[[10,3.9489,0.134],[16,2.4489,0.125],[25,1.5387,0.121],[35,1.1131,0.115],[50,0.8222,0.108],[70,0.5686,0.104],[95,0.4112,0.102],[120,0.3255,0.1],[150,0.2656,0.099],[185,0.2121,0.098],[240,0.1627,0.096],[300,0.1314,0.094],[400,0.1038,0.094],[500,0.0828,0.092],[630,0.0666,0.092],[800,0.0551,0.091],[1000,0.0471,0.088]]},
+    "MC-CU-PVC": {maxTemp:70,rows:[[1.5,14.4777,0.132],[2.5,8.8661,0.123],[4,5.5159,0.123],[6,3.6853,0.116],[10,2.1898,0.111],[16,1.3763,0.105],[25,0.8703,0.104],[35,0.6276,0.101],[50,0.4639,0.097],[70,0.322,0.094],[95,0.2328,0.094],[120,0.1856,0.091],[150,0.1514,0.091],[185,0.1224,0.091],[240,0.0952,0.09],[300,0.078,0.089],[400,0.0638,0.089],[500,0.0531,0.088]]},
+    "MC-CU-XLPE":{maxTemp:90,rows:[[1.5,15.4287,0.128],[2.5,9.4485,0.118],[4,5.8783,0.113],[6,3.9274,0.106],[10,2.3336,0.103],[16,1.4667,0.098],[25,0.9275,0.099],[35,0.6688,0.096],[50,0.4944,0.092],[70,0.3431,0.09],[95,0.2481,0.088],[120,0.1976,0.087],[150,0.1612,0.088],[185,0.1302,0.088],[240,0.1012,0.087],[300,0.0829,0.086],[400,0.0676,0.085],[500,0.0561,0.085]]},
+    "MC-AL-PVC": {maxTemp:70,rows:[[10,3.7007,0.111],[16,2.295,0.105],[25,1.4421,0.106],[35,1.0433,0.101],[50,0.7707,0.097],[70,0.5331,0.094],[95,0.3856,0.094],[120,0.3055,0.091],[150,0.2494,0.091],[185,0.1994,0.091],[240,0.1533,0.09],[300,0.124,0.09],[400,0.0984,0.089],[500,0.0789,0.088]]},
+    "MC-AL-XLPE":{maxTemp:90,rows:[[10,3.949,0.103],[16,2.449,0.098],[25,1.5388,0.099],[35,1.1133,0.096],[50,0.8224,0.092],[70,0.5688,0.09],[95,0.4115,0.088],[120,0.3259,0.087],[150,0.266,0.088],[185,0.2126,0.088],[240,0.1634,0.087],[300,0.1321,0.086],[400,0.1047,0.085],[500,0.0838,0.085]]}
+  };
+  const cd=CABLE_DATA_LOCAL[cT]; if(!cd)return;
+  const crow=cd.rows.find(r=>r[0]===Number(size)); if(!crow)return;
+  const Rkm=crow[1], Xkm=crow[2], R=Rkm*length/1e3, X=Xkm*length/1e3;
+  const Ib=(phases===3)?(loadKVA*1e3)/(Math.sqrt(3)*voltage):(loadKVA*1e3)/voltage;
+
+  /* ── Icb from column selection ── */
+  let Icb = 0, colLetter = '?', k2=1, k_depth=1, k_soil=1, k_pvc=1;
+  let tblName='—', baseCond='—';
+  let Iz_final = 0;   // shared — set inside the if block, used in always-runs
+
+  if (STATE.colIdx !== null) {
+    const at = AMP_COLS[cT];
+    if (at) {
+      const si = at.sizes.indexOf(Number(size));
+      Icb = si>=0 ? (at.cols[si][STATE.colIdx]||0) : 0;
+      colLetter = COL_LETTER[STATE.colIdx];
+    }
+
+    /* k1: medium from L1 */
+    const isGnd = STATE.l1==='underground';
+    const med = isGnd ? 'ground' : 'air';
+    const maxT = cd.maxTemp;
+    const temp = parseInt(tK1);
+    const k1v = K1_TABLE[med][maxT]?.[temp]??1.0;
+
+    /* k2 */
+    const l3key = STATE.l1+'-'+STATE.l2;
+    const l3opts = L3_OPTIONS[l3key]||[];
+    const l3opt  = l3opts.find(o=>o.key===STATE.l3)||{};
+    const k2info = resolveK2Table(cT, STATE.l2, STATE.l3, l3opt);
+    k2 = getK2fromTable(k2info.tbl, k2info.sub, nC);
+    tblName = k2info.name;
+
+    /* depth factor (underground only) */
+    if (isGnd) {
+      const dkey = document.getElementById('depthSel')?.value||'0.80_0.97_0.96_0.94';
+      k_depth = getDepthFactor(dkey, size);
+      document.getElementById('depth-val').innerHTML = k_depth.toFixed(3)+'<span class="derate-val-lbl">k_depth</span>';
+      const skey = document.getElementById('soilSel')?.value||'1.2_1.00';
+      k_soil = SOIL_FACTORS[skey]??1.0;
+      document.getElementById('soil-val').innerHTML = k_soil.toFixed(3)+'<span class="derate-val-lbl">k_soil</span>';
+    }
+    /* pvc factor */
+    if (cT.includes('PVC')) {
+      k_pvc = parseFloat(document.getElementById('pvcSel')?.value||'1.000');
+      document.getElementById('pvc-val').innerHTML = k_pvc.toFixed(3)+'<span class="derate-val-lbl">k_pvc</span>';
+    }
+    document.getElementById('k2-val').innerHTML = k2.toFixed(3)+'<span class="derate-val-lbl">k<sub>2</sub></span>';
+
+    /* Update Icb display */
+    document.getElementById('icb-val').textContent = Icb||'—';
+    document.getElementById('icb-col-badge').textContent = 'col ('+colLetter+')';
+    document.getElementById('icb-tbl-badge').textContent = tblName;
+    baseCond = isGnd ? '35°C gnd · 0.5m · 1.2 K·m/W' : '40°C air';
+    document.getElementById('icb-base-cond').textContent = 'Base: '+baseCond;
+
+    /* Update k1 medium display */
+    document.getElementById('k1Medium').value = isGnd ? 'Ground — buried/duct' : 'Air — exposed/tray';
+
+    const k1 = k1v;
+    document.getElementById('k1Val').textContent = k1.toFixed(3);
+
+    const Iz = Icb * k1 * k_depth * k_soil * k_pvc * k2 * k3;
+    Iz_final = Iz;
+
+    document.getElementById("deratingResults").innerHTML=
+      metric("I<sub>cb</sub> base (col "+colLetter+")",""+Icb,"A")+
+      metric("k<sub>1</sub> temp",""+k1.toFixed(3),"")+
+      metric("k_depth",""+k_depth.toFixed(3),"")+
+      metric("k_soil",""+k_soil.toFixed(3),"")+
+      metric("k_pvc",""+k_pvc.toFixed(3),"")+
+      metric("k<sub>2</sub> group",""+k2.toFixed(3),"")+
+      metric("k<sub>3</sub> situation",""+k3.toFixed(4),"")+
+      metric("I<sub>z</sub> final",""+Iz.toFixed(2),"A",Iz>Ib?"ok":"warn");
+
+  } else {
+    /* No installation selected yet — derating chain pending */
+    document.getElementById("deratingResults").innerHTML=
+      '<span style="font-family:var(--mono);font-size:11px;color:var(--text3)">← Select installation method (panel 03) to compute full derating chain</span>';
+  }
+
+  /* ── Always compute: Vdrop, CB, SCC, checks ── */
+  const sinPF = Math.sqrt(Math.max(0,1-pf*pf));
+  const Vd=(phases===3)?Math.sqrt(3)*Ib*(R*pf+X*sinPF):2*Ib*(R*pf+X*sinPF);
+  const Vpct=(Vd/voltage)*100, Ib125=Ib*1.25, cbCalc=nextCB(Ib125);
+
+  buildCB(cbCalc);
+  const cCB=parseInt(document.getElementById("chosenCB").value)||cbCalc;
+  const hOk=cCB>=cbCalc;
+  document.getElementById("cbHint").innerHTML=
+    `Calc. min: <strong>${cbCalc} A</strong> &nbsp;`+(hOk?`<span class="chip chip-ok">OK</span>`:`<span class="chip chip-warn">BELOW MIN</span>`);
+
+  const Iz_known = STATE.colIdx !== null;
+  const Iz_check = Iz_final;   // already computed above when Iz_known is true
+
+  const okVd  = Vpct < vLim;
+  const okCB  = cCB >= cbCalc;
+  const okIz  = Iz_known ? Iz_check > Ib : null;
+
+  document.getElementById("cableResults").innerHTML=
+    metric("Load",""+loadKW.toFixed(2),"kW")+
+    metric("Current I<sub>b</sub>",""+Ib.toFixed(2),"A")+
+    metric("R",""+Rkm.toFixed(4),"Ω/km")+
+    metric("X",""+Xkm.toFixed(4),"Ω/km")+
+    metric("Z cable",""+Math.sqrt(Rkm**2+Xkm**2).toFixed(4),"Ω/km")+
+    metric("Total R",""+R.toFixed(5),"Ω")+
+    metric("Total X",""+X.toFixed(5),"Ω")+
+    metric("Voltage drop",""+Vd.toFixed(3),"V",okVd?"ok":"warn")+
+    metric("% V-drop",""+Vpct.toFixed(3),"%",okVd?"ok":"warn")+
+    metric("V-drop limit",""+vLim.toFixed(1),"%")+
+    metric("I<sub>b</sub> × 1.25",""+Ib125.toFixed(2),"A")+
+    metric("CB calc. min",""+cbCalc,"A")+
+    metric("Chosen CB",""+cCB,"A",okCB?"ok":"warn");
+
+  document.getElementById("checksDiv").innerHTML=
+    (Iz_known
+      ? `<div class="check-row"><span>I<sub>z</sub> (${Iz_check.toFixed(1)} A) &gt; I<sub>b</sub> (${Ib.toFixed(1)} A)</span>${chip(okIz)}</div>`
+      : `<div class="check-row"><span>I<sub>z</sub> vs I<sub>b</sub></span><span style="font-family:var(--mono);font-size:10px;color:var(--text3)">— select installation in panel 03</span></div>`)+
+    `<div class="check-row"><span>Chosen CB (${cCB} A) &ge; calc. min (${cbCalc} A)</span>${chip(okCB)}</div>`+
+    `<div class="check-row"><span>V-drop (${Vpct.toFixed(2)}%) &lt; limit (${vLim}%)</span>${chip(okVd)}</div>`+
+    `<div class="check-row check-overall"><span>Overall design check</span>${
+      Iz_known ? chip(okIz&&okCB&&okVd,"PASS","FAIL") :
+      chip(okCB&&okVd,"PASS (Iz pending)","FAIL")
+    }</div>`;
+
+  const Zsrc=voltage/(Math.sqrt(3)*sccKA*1e3), Zc=Math.sqrt(R**2+X**2);
+  const scc=voltage/(Math.sqrt(3)*(Zsrc+Zc))/1e3;
+  document.getElementById("sccResults").innerHTML=
+    metric("Z source",""+Zsrc.toFixed(5),"Ω")+
+    metric("Z cable",""+Zc.toFixed(5),"Ω")+
+    metric("SCC end",""+scc.toFixed(3),"kA")+
+    metric("SCC end",""+(scc*1e3).toFixed(1),"A");
+
+  drawK1();
+  calcConduit();
+}
+
+/* ── K3 row events — checkbox highlight ─────────────────────────── */
+document.querySelectorAll("#k3Table tbody tr").forEach(row=>{
+  row.addEventListener("mouseenter",()=>updateK3Illus(parseInt(row.dataset.k3)));
+  const cb = row.querySelector("input[type=checkbox]");
+  const numInput = row.querySelector("input[type=number]");
+  cb.addEventListener("change",function(){
+    // Toggle active class on row
+    row.classList.toggle("active", this.checked);
+    if(this.checked) updateK3Illus(parseInt(row.dataset.k3));
+    calc();
+  });
+  // Sync initial state
+  if(cb.checked) row.classList.add("active");
+  numInput.addEventListener("input", calc);
+});
+
+/* ── K1 CHART ───────────────────────────────────────────────────── */
+function drawK1(){
+  const cv=document.getElementById("k1Canvas");
+  if(!cv)return;
+  const W=cv.offsetWidth,H=cv.offsetHeight;
+  cv.width=W;cv.height=H;
+  const c=cv.getContext("2d");
+  c.clearRect(0,0,W,H);
+  const ts=[10,15,20,25,30,35,40,45,50,55,60];
+  const sel=parseInt(document.getElementById("k1Temp").value);
+  const cT=document.getElementById("cableType").value;
+  const isGnd=STATE.l1==='underground';
+  const med=isGnd?"ground":"air";
+  const maxTv=cT.includes("XLPE")?90:70;
+  const p={l:46,r:14,t:16,b:36};
+  const gW=W-p.l-p.r,gH=H-p.t-p.b;
+  for(let i=0;i<=6;i++){const y=p.t+gH*(1-i/6);c.strokeStyle="rgba(0,0,0,0.06)";c.lineWidth=1;c.beginPath();c.moveTo(p.l,y);c.lineTo(p.l+gW,y);c.stroke();}
+  c.strokeStyle="rgba(0,0,0,0.15)";c.lineWidth=1;c.beginPath();c.moveTo(p.l,p.t);c.lineTo(p.l,p.t+gH);c.lineTo(p.l+gW,p.t+gH);c.stroke();
+  c.fillStyle="#374151";c.font="10px 'DM Mono',monospace";c.textAlign="right";
+  for(let i=0;i<=6;i++)c.fillText((0.5+i*0.15).toFixed(2),p.l-5,p.t+gH*(1-i/6)+3);
+  c.textAlign="center";c.fillStyle="#374151";c.font="9px 'DM Mono',monospace";
+  ts.forEach((t,i)=>c.fillText(t,p.l+gW*(i/(ts.length-1)),p.t+gH+16));
+  c.fillText("Ambient temperature (°C)",p.l+gW/2,p.t+gH+30);
+  const series=[{m:"air",T:70,col:"#4d9fff"},{m:"air",T:90,col:"#a855f7"},{m:"ground",T:70,col:"#00e5a0"},{m:"ground",T:90,col:"#f97316"}];
+  const labels=["Air/PVC 70°C","Air/XLPE 90°C","Gnd/PVC 70°C","Gnd/XLPE 90°C"];
+  series.forEach((s,si)=>{
+    const pts=ts.map((t,i)=>{const v=K1_TABLE[s.m][s.T][t];return{x:p.l+gW*(i/(ts.length-1)),y:p.t+gH*(1-(v-0.5)/0.9)};});
+    const active=(s.m===med&&s.T===maxTv);
+    c.strokeStyle=s.col;c.lineWidth=active?2.5:1;c.globalAlpha=active?1:0.2;c.setLineDash(active?[]:[4,3]);
+    c.beginPath();pts.forEach((pt,i)=>i===0?c.moveTo(pt.x,pt.y):c.lineTo(pt.x,pt.y));c.stroke();
+    c.setLineDash([]);c.globalAlpha=1;
+    const lx=p.l+8+si*74,ly=p.t+4;
+    c.strokeStyle=s.col;c.lineWidth=active?2:1;c.globalAlpha=active?1:0.35;
+    c.beginPath();c.moveTo(lx,ly+5);c.lineTo(lx+16,ly+5);c.stroke();
+    c.globalAlpha=active?1:0.35;c.fillStyle=s.col;c.font=(active?"bold ":"")+"9px 'DM Mono',monospace";
+    c.textAlign="left";c.fillText(labels[si],lx+20,ly+9);c.globalAlpha=1;
+  });
+  const v=K1_TABLE[med][maxTv][sel];
+  if(v!==undefined){
+    const i=ts.indexOf(sel);
+    if(i>=0){
+      const x=p.l+gW*(i/(ts.length-1)),y=p.t+gH*(1-(v-0.5)/0.9);
+      c.fillStyle="#00e5a0";c.beginPath();c.arc(x,y,5,0,2*Math.PI);c.fill();
+      c.strokeStyle="#f8f9fa";c.lineWidth=1.5;c.beginPath();c.arc(x,y,5,0,2*Math.PI);c.stroke();
+      c.fillStyle="#00e5a0";c.font="bold 11px 'DM Mono',monospace";c.textAlign="left";
+      c.fillText(`k1 = ${v}`,x+9,y+4);
+    }
+  }
+  document.getElementById("k1Val").textContent=v!==undefined?v.toFixed(3):"—";
+}
+
+/* ── K3 ILLUS ── */
+function updateK3Illus(idx){
+  const d=K3_SVG[idx]; if(!d) return;
+  document.getElementById("k3IllusTag").textContent    = "Installation condition";
+  document.getElementById("k3IllusTitle").textContent  = d.title;
+  document.getElementById("k3IllusSVG").innerHTML      = d.svg;
+  document.getElementById("k3IllusCaption").textContent= d.caption;
+}
+
+/* ── CONDUIT ── */
+const CD=[{s:"70",q:10,i:"XLPE/PVC"},{s:"16",q:0,i:"PVC/PVC"},{s:"2.5",q:0,i:"PVC/PVC"},
+          {s:"2.5",q:0,i:"PVC/PVC"},{s:"2.5",q:0,i:"PVC/PVC"},{s:"70",q:0,i:"PVC/PVC"}];
+const DIAS2={"1C-CU-PVC":{1.5:6,2.5:6.4,4:7.4,6:7.9,10:8.5,16:9.5,25:11.1,35:12.1,50:13.7,70:15.3,95:17.5,120:18.8,150:20.9,185:23.2,240:26.1},"1C-CU-XLPE":{1.5:5.8,2.5:6.2,4:6.8,6:7.3,10:7.9,16:8.9,25:10.5,35:11.5,50:12.9,70:14.7,95:16.5,120:18,150:20.1,185:22.2,240:24.9}};
+function getDia(sz,ins){const s=parseFloat(sz),t=ins.includes("XLPE")?DIAS2["1C-CU-XLPE"]:DIAS2["1C-CU-PVC"];return t?.[s]||Math.sqrt(s)*2.5;}
+function buildCR(){
+  const d=document.getElementById("condRows");d.innerHTML="";
+  CD.forEach((c,i)=>{
+    const row=document.createElement("div");row.className="cond-row";
+    row.innerHTML=`<span class="cond-row-label">Conductor ${i+1}</span>
+      <select id="ci${i}" onchange="calcConduit()"><option ${c.i==="XLPE/PVC"?"selected":""}>XLPE/PVC</option><option ${c.i==="PVC/PVC"?"selected":""}>PVC/PVC</option></select>
+      <select id="cs${i}" onchange="calcConduit()">${[1.5,2.5,4,6,10,16,25,35,50,70,95,120,150,185,240].map(v=>`<option ${v==c.s?"selected":""}>${v}</option>`).join("")}</select>
+      <input type="number" id="cq${i}" value="${c.q}" min="0" step="1" onchange="calcConduit()" placeholder="qty">`;
+    d.appendChild(row);
+  });
+}
+function calcConduit(){
+  const mm=parseFloat(document.getElementById("conduitSize").value)||75;
+  let tA=0,tQ=0;
+  for(let i=0;i<6;i++){
+    const q=parseInt(document.getElementById("cq"+i)?.value)||0;if(!q)continue;
+    tA+=Math.PI*(getDia(document.getElementById("cs"+i)?.value||"10",document.getElementById("ci"+i)?.value||"PVC/PVC")/2)**2*q;tQ+=q;
+  }
+  const fp=(tA/(Math.PI*(mm/2)**2))*100,ok=fp<=40;
+  document.getElementById("condResults").innerHTML=
+    metric("Conduit Ø",""+mm,"mm")+metric("Avail. 40%",""+(Math.PI*(mm/2)**2*0.4).toFixed(1),"mm²")+
+    metric("Conductors",""+tQ,"pcs")+metric("Cond. area",""+tA.toFixed(1),"mm²")+
+    metric("Fill factor",""+fp.toFixed(2),"%",ok?"ok":"warn")+metric("Check ≤40%",ok?"PASS":"FAIL","",ok?"ok":"warn");
+}
+
+/* ── INIT ── */
+function buildCB(sug){
+  const s=document.getElementById("chosenCB"),prev=parseInt(s.value)||0;
+  s.innerHTML=CB_SIZES.map(v=>`<option value="${v}"${v===(prev||sug)?" selected":""}>${v} A</option>`).join("");
+}
+buildCB(63); buildCR();
+document.querySelectorAll("input:not([type=checkbox]):not(.k3-table input[type=number]), select").forEach(el=>{
+  el.addEventListener("change",function(){updateContextualCards();calc();});
+  el.addEventListener("input",function(){calc();});
+});
+calc();
+window.addEventListener("resize",drawK1);
+
+</script>
+</body>
+</html>
