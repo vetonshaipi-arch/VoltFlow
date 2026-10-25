@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>HistoryPanel</class>
+ <widget class="QDialog" name="HistoryPanel">
+  <property name="windowTitle"><string>Revision History</string></property>
+  <property name="minimumSize"><size><width>640</width><height>400</height></size></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTableWidget" name="historyTable">
+     <column>
+      <property name="text"><string>Date</string></property>
+     </column>
+     <column>
+      <property name="text"><string>User</string></property>
+     </column>
+     <column>
+      <property name="text"><string>Package</string></property>
+     </column>
+     <column>
+      <property name="text"><string>Action</string></property>
+     </column>
+     <column>
+      <property name="text"><string>Snapshot</string></property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnClose">
+     <property name="text"><string>Close</string></property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/><connections/>
+</ui>

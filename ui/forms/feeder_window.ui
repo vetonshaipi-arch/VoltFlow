@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FeederWindow</class>
+ <widget class="QDialog" name="FeederWindow">
+  <property name="windowTitle"><string>Feeder</string></property>
+  <property name="minimumSize"><size><width>980</width><height>760</height></size></property>
+  <layout class="QVBoxLayout" name="rootLayout">
+   <property name="spacing"><number>0</number></property>
+   <property name="leftMargin"><number>0</number></property>
+   <property name="topMargin"><number>0</number></property>
+   <property name="rightMargin"><number>0</number></property>
+   <property name="bottomMargin"><number>0</number></property>
+   <item>
+    <widget class="QWidget" name="headerBar">
+     <property name="minimumSize"><size><width>0</width><height>52</height></size></property>
+     <property name="maximumSize"><size><width>16777215</width><height>52</height></size></property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="widgetResizable"><bool>true</bool></property>
+     <widget class="QWidget" name="scrollBody">
+      <layout class="QVBoxLayout" name="bodyLayout">
+       <item><widget class="QWidget" name="panelIdentity"/></item>
+       <item><widget class="QWidget" name="panelCircuit"/></item>
+       <item><widget class="QWidget" name="panelCB"/></item>
+       <item><widget class="QWidget" name="panelCable"/></item>
+       <item><widget class="QPushButton" name="btnCalculate"><property name="text"><string>CALCULATE FEEDER</string></property></widget></item>
+       <item><widget class="QWidget" name="panelResults"/></item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="bottomBar">
+     <property name="minimumSize"><size><width>0</width><height>40</height></size></property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/><connections/>
+</ui>

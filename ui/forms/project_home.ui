@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ProjectTab</class>
+ <widget class="QWidget" name="ProjectTab">
+  <layout class="QVBoxLayout" name="rootLayout">
+   <property name="spacing"><number>0</number></property>
+   <property name="leftMargin"><number>0</number></property>
+   <property name="topMargin"><number>0</number></property>
+   <property name="rightMargin"><number>0</number></property>
+   <property name="bottomMargin"><number>0</number></property>
+   <item>
+    <widget class="QWidget" name="projectBar">
+     <property name="minimumSize"><size><width>0</width><height>52</height></size></property>
+     <property name="maximumSize"><size><width>16777215</width><height>52</height></size></property>
+     <layout class="QHBoxLayout" name="projectBarLayout">
+      <property name="leftMargin"><number>12</number></property>
+      <property name="topMargin"><number>6</number></property>
+      <property name="rightMargin"><number>12</number></property>
+      <property name="bottomMargin"><number>6</number></property>
+      <item><widget class="QLabel" name="lblProject"><property name="text"><string>No project open</string></property></widget></item>
+      <item><widget class="QLabel" name="lblMeta"><property name="text"><string/></property></widget></item>
+      <item><spacer name="barSpacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property></spacer></item>
+      <item><widget class="QLabel" name="lblEngineerTag"><property name="text"><string>Engineer:</string></property></widget></item>
+      <item><widget class="QLineEdit" name="userEdit"><property name="placeholderText"><string>Your name (engineer)</string></property><property name="maximumSize"><size><width>180</width><height>16777215</height></size></property></widget></item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSplitter" name="mainSplitter">
+     <property name="orientation"><enum>Qt::Horizontal</enum></property>
+     <widget class="QStackedWidget" name="leftStack">
+      <widget class="QWidget" name="pageRecent">
+       <layout class="QVBoxLayout" name="recentLayout">
+        <item><widget class="QLabel" name="lblRecentTitle"><property name="text"><string>Recent Projects</string></property></widget></item>
+        <item><widget class="QScrollArea" name="recentScroll"><property name="widgetResizable"><bool>true</bool></property><widget class="QWidget" name="recentContainer"/></widget></item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="pagePackages">
+       <layout class="QVBoxLayout" name="packagesLayout">
+        <item>
+         <layout class="QHBoxLayout" name="packageToolbar">
+          <item><widget class="QPushButton" name="btnNewPackage"><property name="text"><string>+ Package</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnOpen"><property name="text"><string>Open</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnLock"><property name="text"><string>Lock</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnUnlock"><property name="text"><string>Unlock</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnStatus"><property name="text"><string>Set Status</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnSnapshots"><property name="text"><string>Snapshots</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnHistory"><property name="text"><string>History</string></property></widget></item>
+          <item><widget class="QPushButton" name="btnRemove"><property name="text"><string>Remove</string></property></widget></item>
+         </layout>
+        </item>
+        <item><widget class="QTableWidget" name="packageTable"/></item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="rightPanel">
+      <layout class="QVBoxLayout" name="rightLayout">
+       <item>
+        <widget class="QGroupBox" name="grpProjectInfo">
+         <property name="title"><string>Project Info</string></property>
+         <layout class="QFormLayout" name="projectInfoForm"/>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="grpEngineers">
+         <property name="title"><string>Engineers</string></property>
+         <layout class="QVBoxLayout" name="engineersLayout">
+          <item><widget class="QTableWidget" name="engineersTable"/></item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="grpInterfaces">
+         <property name="title"><string>Interface Packages</string></property>
+         <layout class="QVBoxLayout" name="interfacesLayout">
+          <item><widget class="QTableWidget" name="interfacesTable"/></item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/><connections/>
+</ui>

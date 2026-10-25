@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>NewPackageDialog</class>
+ <widget class="QDialog" name="NewPackageDialog">
+  <property name="windowTitle"><string>New Package</string></property>
+  <property name="minimumSize"><size><width>380</width><height>0</height></size></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0"><widget class="QLabel" name="labelName"><property name="text"><string>Package name</string></property></widget></item>
+     <item row="0" column="1"><widget class="QLineEdit" name="nameEdit"><property name="text"><string>Package-A</string></property></widget></item>
+     <item row="1" column="0"><widget class="QLabel" name="labelZone"><property name="text"><string>Zone / Area</string></property></widget></item>
+     <item row="1" column="1"><widget class="QLineEdit" name="zoneEdit"><property name="maximumSize"><size><width>60</width><height>16777215</height></size></property><property name="text"><string>A</string></property></widget></item>
+     <item row="2" column="0"><widget class="QLabel" name="labelDesc"><property name="text"><string>Description</string></property></widget></item>
+     <item row="2" column="1"><widget class="QLineEdit" name="descEdit"/></item>
+     <item row="3" column="0"><widget class="QLabel" name="labelEng"><property name="text"><string>Engineer</string></property></widget></item>
+     <item row="3" column="1"><widget class="QComboBox" name="engineerCombo"/></item>
+     <item row="4" column="0"><widget class="QLabel" name="labelStatus"><property name="text"><string>Status</string></property></widget></item>
+     <item row="4" column="1"><widget class="QComboBox" name="statusCombo"/></item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons"><set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set></property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/><connections/>
+</ui>

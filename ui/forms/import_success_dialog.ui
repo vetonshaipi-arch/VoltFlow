@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ImportSuccessDialog</class>
+ <widget class="QDialog" name="ImportSuccessDialog">
+  <property name="windowTitle"><string>Package Imported Successfully</string></property>
+  <property name="minimumSize"><size><width>460</width><height>0</height></size></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing"><number>10</number></property>
+   <item>
+    <widget class="QWidget" name="hdr">
+     <layout class="QHBoxLayout" name="hdrLayout">
+      <property name="leftMargin"><number>12</number></property>
+      <property name="topMargin"><number>10</number></property>
+      <property name="rightMargin"><number>12</number></property>
+      <property name="bottomMargin"><number>10</number></property>
+      <item><widget class="QLabel" name="lblIcon"><property name="text"><string>✔</string></property></widget></item>
+      <item>
+       <layout class="QVBoxLayout" name="hdrText">
+        <item><widget class="QLabel" name="lblTitle"><property name="text"><string>Package Accepted</string></property></widget></item>
+        <item><widget class="QLabel" name="lblBoard"><property name="text"><string>Sub-board attached to hierarchy</string></property></widget></item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTextEdit" name="comparisonEdit">
+     <property name="readOnly"><bool>true</bool></property>
+     <property name="maximumSize"><size><width>16777215</width><height>90</height></size></property>
+    </widget>
+   </item>
+   <item><widget class="QLabel" name="lblNote"><property name="text"><string>Run "Calc All" to propagate the imported loads through the full distribution hierarchy.</string></property><property name="wordWrap"><bool>true</bool></property></widget></item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons"><set>QDialogButtonBox::Ok</set></property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/><connections/>
+</ui>

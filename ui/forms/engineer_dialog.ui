@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EngineerDialog</class>
+ <widget class="QDialog" name="EngineerDialog">
+  <property name="windowTitle"><string>Engineer</string></property>
+  <property name="minimumSize"><size><width>360</width><height>0</height></size></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0"><widget class="QLabel" name="labelName"><property name="text"><string>Name</string></property></widget></item>
+     <item row="0" column="1"><widget class="QLineEdit" name="nameEdit"/></item>
+     <item row="1" column="0"><widget class="QLabel" name="labelInitials"><property name="text"><string>Initials</string></property></widget></item>
+     <item row="1" column="1"><widget class="QLineEdit" name="initialsEdit"/></item>
+     <item row="2" column="0"><widget class="QLabel" name="labelEmail"><property name="text"><string>Email</string></property></widget></item>
+     <item row="2" column="1"><widget class="QLineEdit" name="emailEdit"/></item>
+     <item row="3" column="0"><widget class="QLabel" name="labelCompany"><property name="text"><string>Company</string></property></widget></item>
+     <item row="3" column="1"><widget class="QLineEdit" name="companyEdit"/></item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons"><set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set></property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/><connections/>
+</ui>

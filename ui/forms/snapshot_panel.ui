@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SnapshotPanel</class>
+ <widget class="QDialog" name="SnapshotPanel">
+  <property name="windowTitle"><string>Snapshots</string></property>
+  <property name="minimumSize"><size><width>500</width><height>300</height></size></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="lblSummary">
+     <property name="text"><string>0 snapshot(s) for package</string></property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="snapshotTable">
+     <column>
+      <property name="text"><string>Snapshot file</string></property>
+     </column>
+     <column>
+      <property name="text"><string>Size</string></property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnClose">
+     <property name="text"><string>Close</string></property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/><connections/>
+</ui>

@@ -1,0 +1,45 @@
+VoltFlow — Qt Designer forms (ui/forms/)
+=========================================
+
+Open in Qt Designer
+-------------------
+  .venv\Scripts\pyside6-designer.exe ui\forms\<name>.ui
+
+Or use the helper script from project root:
+  powershell -File tools\open_designer.ps1 motor_circuit_sizing
+  powershell -File tools\open_designer.ps1          (opens forms folder)
+
+Forms (match current app screens)
+---------------------------------
+motor_circuit_sizing.ui    Reference / legacy — motor strip is built in code
+                           (ui/motor_circuit_sizing.py) to match LOAD|CB|CABLE layout
+switchboard_window.ui      Board tree + grid + props stack (layout shell)
+ribbon_main.ui             Main window: ribbon tabs + stacked pages
+project_home.ui            Project tab (packages, recent, info panels)
+feeder_window.ui           Feeder editor dialog (panel placeholders)
+conduit_dialog.ui          Conduit sizing dialog
+cable_selector_main.ui     VSEng cable selector shell
+engineer_dialog.ui         Engineer name / initials / email / company
+new_package_dialog.ui      New package
+new_project_dialog.ui      New project (+ folder browse row)
+stub_spec_dialog.ui        SubPanel interface spec
+import_result_dialog.ui    Import blocked (spec violated)
+import_success_dialog.ui   Import success confirmation
+history_panel.ui           Revision history table
+snapshot_panel.ui          Package snapshots table
+board_settings_dialog.ui   Board identity / electrical / physical / xfmr
+
+Runtime vs Designer-only
+------------------------
+Wired at runtime (changes in .ui appear after restart):
+  motor_circuit_sizing.ui  → ui/motor_circuit_sizing.py
+
+Designer-only for now (Python still builds UI in code; .ui mirrors layout):
+  All other forms above — edit layout/widgets in Designer, then port
+  object names into the matching .py file when you want runtime loading.
+
+Validate all .ui files load:
+  .venv\Scripts\python.exe tools\validate_ui_forms.py
+
+Optional compile to Python:
+  .venv\Scripts\pyside6-uic.exe ui\forms\motor_circuit_sizing.ui -o ui\generated\ui_motor.py

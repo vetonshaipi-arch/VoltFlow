@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Switchboard",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/switchboard.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder};${workspaceFolder}/VSEngCableSelector"
+            },
+            "justMyCode": true
+        },
+        {
+            "name": "Run Feeder (standalone)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/feeder.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder};${workspaceFolder}/VSEngCableSelector"
+            },
+            "justMyCode": true
+        }
+    ]
+}

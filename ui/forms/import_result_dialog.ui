@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ImportResultDialog</class>
+ <widget class="QDialog" name="ImportResultDialog">
+  <property name="windowTitle"><string>Import Blocked — Specification Violated</string></property>
+  <property name="minimumSize"><size><width>560</width><height>0</height></size></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing"><number>10</number></property>
+   <item>
+    <widget class="QWidget" name="hdr">
+     <layout class="QHBoxLayout" name="hdrLayout">
+      <property name="leftMargin"><number>12</number></property>
+      <property name="topMargin"><number>10</number></property>
+      <property name="rightMargin"><number>12</number></property>
+      <property name="bottomMargin"><number>10</number></property>
+      <item><widget class="QLabel" name="lblIcon"><property name="text"><string>✘</string></property></widget></item>
+      <item>
+       <layout class="QVBoxLayout" name="hdrText">
+        <item><widget class="QLabel" name="lblTitle"><property name="text"><string>Import Blocked</string></property></widget></item>
+        <item><widget class="QLabel" name="lblPath"><property name="text"><string>Board · path</string></property></widget></item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item><widget class="QLabel" name="lblSpec"><property name="text"><string>Allocated: S ≤ 0 kVA | Ib ≤ 0 A | Vd ≤ 0 %</string></property></widget></item>
+   <item>
+    <widget class="QTextEdit" name="errorsEdit">
+     <property name="readOnly"><bool>true</bool></property>
+     <property name="maximumSize"><size><width>16777215</width><height>120</height></size></property>
+    </widget>
+   </item>
+   <item><widget class="QLabel" name="lblInstr"><property name="text"><string>The child engineer must reduce loads or cable voltage drop to meet the allocated specification before this package can be imported.</string></property><property name="wordWrap"><bool>true</bool></property></widget></item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons"><set>QDialogButtonBox::Close</set></property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/><connections/>
+</ui>

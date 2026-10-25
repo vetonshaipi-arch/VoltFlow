@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>NewProjectDialog</class>
+ <widget class="QDialog" name="NewProjectDialog">
+  <property name="windowTitle"><string>New Project</string></property>
+  <property name="minimumSize"><size><width>420</width><height>0</height></size></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0"><widget class="QLabel" name="labelName"><property name="text"><string>Project name</string></property></widget></item>
+     <item row="0" column="1"><widget class="QLineEdit" name="nameEdit"><property name="text"><string>New Project</string></property></widget></item>
+     <item row="1" column="0"><widget class="QLabel" name="labelClient"><property name="text"><string>Client</string></property></widget></item>
+     <item row="1" column="1"><widget class="QLineEdit" name="clientEdit"/></item>
+     <item row="2" column="0"><widget class="QLabel" name="labelLocation"><property name="text"><string>Location</string></property></widget></item>
+     <item row="2" column="1"><widget class="QLineEdit" name="locationEdit"/></item>
+     <item row="3" column="0"><widget class="QLabel" name="labelEngineer"><property name="text"><string>Lead engineer</string></property></widget></item>
+     <item row="3" column="1"><widget class="QLineEdit" name="engineerEdit"/></item>
+     <item row="4" column="0"><widget class="QLabel" name="labelStandard"><property name="text"><string>Standard</string></property></widget></item>
+     <item row="4" column="1"><widget class="QComboBox" name="standardCombo"/></item>
+     <item row="5" column="0"><widget class="QLabel" name="labelFolder"><property name="text"><string>Folder</string></property></widget></item>
+     <item row="5" column="1">
+      <layout class="QHBoxLayout" name="folderLayout">
+       <item><widget class="QLineEdit" name="folderEdit"><property name="readOnly"><bool>true</bool></property><property name="placeholderText"><string>Choose project folder…</string></property></widget></item>
+       <item><widget class="QPushButton" name="btnBrowse"><property name="text"><string>Browse…</string></property></widget></item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons"><set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set></property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/><connections/>
+</ui>

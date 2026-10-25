@@ -1,0 +1,13 @@
+{
+  "pythonVersion": "3.11",
+  "venvPath": ".",
+  "venv": ".venv",
+  "extraPaths": [
+    ".",
+    "ui",
+    "VSEngCableSelector",
+    "VSEngCableSelector/ui"
+  ],
+  "reportMissingImports": "none",
+  "reportMissingModuleSource": "none"
+}

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BoardSettingsDialog</class>
+ <widget class="QDialog" name="BoardSettingsDialog">
+  <property name="windowTitle"><string>Board Settings</string></property>
+  <property name="minimumSize"><size><width>500</width><height>0</height></size></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing"><number>10</number></property>
+   <item>
+    <widget class="QGroupBox" name="grpIdentity">
+     <property name="title"><string>Identity</string></property>
+     <layout class="QFormLayout" name="identityLayout">
+      <item row="0" column="0"><widget class="QLabel" name="lblName"><property name="text"><string>Name</string></property></widget></item>
+      <item row="0" column="1"><widget class="QLineEdit" name="nameEdit"/></item>
+      <item row="1" column="0"><widget class="QLabel" name="lblProject"><property name="text"><string>Project</string></property></widget></item>
+      <item row="1" column="1"><widget class="QLineEdit" name="projectEdit"/></item>
+      <item row="2" column="0"><widget class="QLabel" name="lblLocation"><property name="text"><string>Location</string></property></widget></item>
+      <item row="2" column="1"><widget class="QLineEdit" name="locationEdit"/></item>
+      <item row="3" column="0"><widget class="QLabel" name="lblDrawing"><property name="text"><string>Drawing Ref</string></property></widget></item>
+      <item row="3" column="1"><widget class="QLineEdit" name="drawingEdit"/></item>
+      <item row="4" column="0"><widget class="QLabel" name="lblEngineer"><property name="text"><string>Engineer</string></property></widget></item>
+      <item row="4" column="1"><widget class="QLineEdit" name="engineerEdit"/></item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpElectrical">
+     <property name="title"><string>Electrical</string></property>
+     <layout class="QHBoxLayout" name="electricalLayout">
+      <item>
+       <layout class="QVBoxLayout" name="colVoltage">
+        <item><widget class="QLabel" name="lblVoltage"><property name="text"><string>Voltage V</string></property></widget></item>
+        <item><widget class="QDoubleSpinBox" name="spinVoltage"><property name="buttonSymbols"><enum>QAbstractSpinBox::NoButtons</enum></property></widget></item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="colFreq">
+        <item><widget class="QLabel" name="lblFreq"><property name="text"><string>Hz</string></property></widget></item>
+        <item><widget class="QDoubleSpinBox" name="spinFreq"><property name="buttonSymbols"><enum>QAbstractSpinBox::NoButtons</enum></property></widget></item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="colPhases">
+        <item><widget class="QLabel" name="lblPhases"><property name="text"><string>Phases</string></property></widget></item>
+        <item><widget class="QComboBox" name="phasesCombo"/></item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="colBusbar">
+        <item><widget class="QLabel" name="lblBusbar"><property name="text"><string>Busbar A</string></property></widget></item>
+        <item><widget class="QComboBox" name="busbarCombo"/></item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpPhysical">
+     <property name="title"><string>Physical</string></property>
+     <layout class="QHBoxLayout" name="physicalLayout">
+      <item>
+       <layout class="QVBoxLayout" name="colFrame">
+        <item><widget class="QLabel" name="lblFrame"><property name="text"><string>Frame</string></property></widget></item>
+        <item><widget class="QComboBox" name="frameCombo"/></item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="colIP">
+        <item><widget class="QLabel" name="lblIP"><property name="text"><string>IP</string></property></widget></item>
+        <item><widget class="QComboBox" name="ipCombo"/></item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="colMount">
+        <item><widget class="QLabel" name="lblMount"><property name="text"><string>Mounting</string></property></widget></item>
+        <item><widget class="QComboBox" name="mountCombo"/></item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="colPanel">
+        <item><widget class="QLabel" name="lblPanelSize"><property name="text"><string>Panel Size</string></property></widget></item>
+        <item><widget class="QComboBox" name="panelSizeCombo"/></item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpTransformer">
+     <property name="title"><string>Transformer</string></property>
+     <layout class="QHBoxLayout" name="transformerLayout">
+      <item>
+       <layout class="QVBoxLayout" name="colSn">
+        <item><widget class="QLabel" name="lblSn"><property name="text"><string>Sn kVA</string></property></widget></item>
+        <item><widget class="QDoubleSpinBox" name="spinSn"><property name="buttonSymbols"><enum>QAbstractSpinBox::NoButtons</enum></property></widget></item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="colVk">
+        <item><widget class="QLabel" name="lblVk"><property name="text"><string>Vk %</string></property></widget></item>
+        <item><widget class="QDoubleSpinBox" name="spinVk"><property name="buttonSymbols"><enum>QAbstractSpinBox::NoButtons</enum></property></widget></item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="colHV">
+        <item><widget class="QLabel" name="lblHV"><property name="text"><string>HV V</string></property></widget></item>
+        <item><widget class="QDoubleSpinBox" name="spinHV"><property name="buttonSymbols"><enum>QAbstractSpinBox::NoButtons</enum></property></widget></item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="colLV">
+        <item><widget class="QLabel" name="lblLV"><property name="text"><string>LV V</string></property></widget></item>
+        <item><widget class="QDoubleSpinBox" name="spinLV"><property name="buttonSymbols"><enum>QAbstractSpinBox::NoButtons</enum></property></widget></item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons"><set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set></property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/><connections/>
+</ui>
